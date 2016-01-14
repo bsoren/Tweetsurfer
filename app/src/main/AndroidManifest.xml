@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+    package="com.anibij.demoapp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Permission - Internet Connect -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.DesignDemo">
+        <activity
+            android:name=".NewMainActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.anibij.demoapp.WebViewActivity"
+            android:label="@string/app_name"/>
+        <activity
+            android:name="com.anibij.demoapp.LoginActivity"
+            android:label="@string/app_name"/>
+
+        <activity
+            android:name="com.anibij.demoapp.StatusActivity"
+            android:label="@string/post_message"/>
+
+        <receiver android:name=".service.StatusObserver">
+            <intent-filter>
+                <action android:name="com.anibij.tweetsurferweetsurfer.NEW_STATUSES"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+
+        </receiver>
+
+        <service android:name="com.anibij.demoapp.service.RefreshService"/>
+
+        <provider
+            android:name="com.anibij.demoapp.model.StatusProvider"
+            android:authorities="com.anibij.demoapp"
+            android:exported="false"/>
+    </application>
+
+</manifest>

@@ -1,0 +1,25 @@
+<resources>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="refresh">refresh</string>
+    <string name="purge">purge</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="app_name">Tweetsurfer</string>
+    <string name="action_settings">Settings</string>
+    <string name="login_to_twitter">Login to Twitter</string>
+    <string name="btn_login">Login to Twitter</string>
+
+    <!-- Twitter Configurations -->
+    <string name="twitter_callback">http://anibij.com</string>
+    <string name="twitter_consumer_key">o7kn8lHPoThttJhOejus6r1wJ</string>
+    <string name="twitter_consumer_secret">EfL1dRYw0xw6lWYogM4A7kuwCSwl2eeCINA746qTT28SSJsJnb</string>
+    <string name="twitter_oauth_verifier">oauth_verifier</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_out">sign out</string>
+    <string name="hello">hello</string>
+    <string name="share_instructions">Enter your message</string>
+    <string name="btn_share">Share</string>
+    <string name="post_message">Post your message</string>
+    <string name="postTweet">send</string>
+
+</resources>
