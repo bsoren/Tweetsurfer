@@ -25,6 +25,9 @@ public class StatusContract {
 
 	public static final String DEFAULT_SORT = Column.CREATED_AT + " DESC"; // 4
 
+	public static final String STATUS_ID =  "STATUS_ID";
+
+
 
 	public class Column { // 5
 		public static final String ID = BaseColumns._ID; // 6

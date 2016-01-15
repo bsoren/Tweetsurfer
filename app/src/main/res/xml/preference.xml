@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:key="username"
+        android:title="username"
+        android:summary="@string/username_summary"/>
+    <EditTextPreference
+        android:key="UPDATE_INTERVAL"
+        android:title="sync interval"
+        android:summary="@string/sync_interval_summary"/>
+
+
+</PreferenceScreen>
+

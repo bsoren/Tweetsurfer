@@ -26,12 +26,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.anibij.demoapp.Utils.AppPrefrences;
+import com.anibij.demoapp.Utils.ConnectionDetector;
 import com.anibij.demoapp.listener.RecyclerItemClickListener;
 import com.anibij.demoapp.model.Status;
 import com.anibij.demoapp.model.StatusAdapter;
 import com.anibij.demoapp.model.StatusContract;
 import com.anibij.demoapp.model.StatusListLoader;
 import com.anibij.demoapp.service.RefreshService;
+import com.anibij.demoapp.view.AlertDialogManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +61,12 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private Button scrollTop;
 
+    // Internet Connection detector
+    private ConnectionDetector cd;
+
+    // Alert Dialog Manager
+    AlertDialogManager alert = new AlertDialogManager();
+
     private List<Status> mStatusList;
 
 
@@ -81,14 +89,14 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
         Log.d(TAG, "onCreateView method - start");
         mContext = getActivity();
         mContentResolver = getActivity().getContentResolver();
-        mSharedPreferences = mContext.getSharedPreferences(AppPrefrences.PREF_NAME,0);
+        mSharedPreferences = mContext.getSharedPreferences(AppPrefrences.PREF_NAME, 0);
 
-        View view = inflater.inflate(R.layout.tweet_fragment,container,false);
+        View view = inflater.inflate(R.layout.tweet_fragment, container, false);
 
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         tvEmptyView = (TextView) view.findViewById(R.id.empty_view);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
-        mSwipeRefreshLayout =(SwipeRefreshLayout) view.findViewById(R.id.layout_swipe_refresh);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.layout_swipe_refresh);
         scrollTop = (Button) view.findViewById(R.id.scrollTop);
 
 
@@ -113,12 +121,28 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
                 Toast.makeText(mContext, "Refreshing...", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(mContext, RefreshService.class);
 
-                long sinceIdLong = mSharedPreferences.getLong(AppPrefrences.PREF_SINCE_ID,1000L);
+                long sinceIdLong = mSharedPreferences.getLong(AppPrefrences.PREF_SINCE_ID, 1000L);
 
-                intent.putExtra("SINCE_ID",sinceIdLong);
+                intent.putExtra("SINCE_ID", sinceIdLong);
 
-                Log.d(TAG,"Sending since_id : "+sinceIdLong);
+                Log.d(TAG, "Sending since_id : " + sinceIdLong);
 
+                cd = new ConnectionDetector(mContext);
+                boolean isInternetAvailable = cd.isConnectingToInternet();
+
+               // Toast.makeText(mContext,"Internet Available? "+isInternetAvailable,Toast.LENGTH_SHORT).show();
+
+                if (!isInternetAvailable) {
+
+                    mSwipeRefreshLayout.setRefreshing(false);
+
+                    alert.showAlertDialog(mContext, "Internet Connection Error",
+                            "Please connect to working Internet Connection", false);
+
+                    // stop executing code by return
+
+                    return;
+                }
 
                 mContext.startService(intent);
 
@@ -157,7 +181,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
                             Toast.makeText(mContext, "Load More Item Clicked", Toast.LENGTH_SHORT).show();
                             Log.d(TAG, "viewType2 : " + viewType);
 
-                            Status maxStatus =  mStatusList.get(position - 1);
+                            Status maxStatus = mStatusList.get(position - 1);
                             String maxId = maxStatus.getId();
 
                             Status deleteStatus = mStatusList.get(position);
@@ -169,13 +193,22 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
                             Log.d(TAG, "Row Deleted : " + rowsDeleted);
 
-                            Intent refreshIntent = new Intent(mContext,RefreshService.class);
-                            refreshIntent.putExtra("MAX_ID",deleteId);
+                            Intent refreshIntent = new Intent(mContext, RefreshService.class);
+                            refreshIntent.putExtra("MAX_ID", deleteId);
                             mContext.startService(refreshIntent);
 
-                              mStatusList.remove(position);
-                              mAdapter.notifyItemRemoved(position);
+                            mStatusList.remove(position);
+                            mAdapter.notifyItemRemoved(position);
                             //mAdapter.notifyItemChanged(position);
+                        }
+                        if (mAdapter.getItemViewType(position) == 0) {
+                            Toast.makeText(mContext, "Tweet Clicked", Toast.LENGTH_SHORT).show();
+                            Status status = mStatusList.get(position);
+                            long statusId = Long.valueOf(status.getId());
+
+                            Intent detailIntent = new Intent(mContext, DetailsActivity.class);
+                            detailIntent.putExtra(StatusContract.Column.ID, statusId);
+                            startActivity(detailIntent);
                         }
 
                     }
@@ -185,7 +218,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 
         // create an Object for Adapter
-        mAdapter = new StatusAdapter(mContext,mStatusList);
+        mAdapter = new StatusAdapter(mContext, mStatusList);
         //mAdapter.setCustomDataAdapter(mAdapter);
 
         if (mStatusList.isEmpty()) {
@@ -237,11 +270,11 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
         Log.e(TAG, "onLoadFinished :");
 
-        if(mStatusList == null){
+        if (mStatusList == null) {
             Log.d(TAG, "mStudent is null");
         }
 
-        if(mStatusList != null){
+        if (mStatusList != null) {
             Log.d(TAG, "mStudent is NOT null size : " + mStatusList.size());
         }
 
@@ -273,14 +306,14 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 
     @Override
-    public void onResume(){
+    public void onResume() {
         Log.d(TAG, "onResume");
         super.onResume();
         getActivity().registerReceiver(mTimelineReceiver, mIntentFilter);
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         Log.d(TAG, "onPause");
         super.onPause();
         getActivity().unregisterReceiver(mTimelineReceiver);
@@ -292,13 +325,22 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            int newTweets = intent.getIntExtra("count",0);
-            int statusSize =  intent.getIntExtra("datasize",0);
-            Toast.makeText(mContext,"New Tweets : "+newTweets,Toast.LENGTH_SHORT).show();
-            Toast.makeText(mContext,"Total Size : "+statusSize,Toast.LENGTH_SHORT).show();
+            int newTweets = intent.getIntExtra("count", 0);
+            int statusSize = intent.getIntExtra("datasize", 0);
+            String twitterError =  intent.getStringExtra("TWITTER_ERROR");
+
+            if(twitterError != null){
+                mSwipeRefreshLayout.setRefreshing(false);
+                alert.showAlertDialog(mContext, "Internet Connection Error",
+                        "Error : "+twitterError, false);
+               // Toast.makeText(mContext,"Error : "+twitterError,Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Toast.makeText(mContext, "New Tweets : " + newTweets, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, "Total Size : " + statusSize, Toast.LENGTH_SHORT).show();
             Log.d(TAG, "Broadcast received By TweetFragment");
             getActivity().getSupportLoaderManager().getLoader(44).onContentChanged();
-           // mStudentLoader.onContentChanged();
+            // mStudentLoader.onContentChanged();
         }
     }
 

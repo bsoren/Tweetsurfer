@@ -33,7 +33,7 @@ import twitter4j.json.DataObjectFactory;
 
 public class RefreshService extends IntentService {
 
-    private static final int NO_OF_TWEETS = 40;
+    private static final int NO_OF_TWEETS = 100;
     private ResultReceiver mResultReceiver;
     int count = 0;
 
@@ -116,7 +116,7 @@ public class RefreshService extends IntentService {
             builder.setJSONStoreEnabled(true);
             //builder.setUserStreamWithFollowingsEnabled(false);
             //builder.setIncludeEntitiesEnabled(true);
-//            builder.setIncludeMyRetweetEnabled(false);
+            builder.setIncludeMyRetweetEnabled(true);
             //builder.setUserStreamRepliesAllEnabled(false);
 
 
@@ -330,6 +330,10 @@ public class RefreshService extends IntentService {
 
         } catch (TwitterException e) {
             Log.d("Failed to post!", e.getMessage());
+            Intent newIntent = new Intent(StatusContract.NEW_ITEMS);
+            newIntent.putExtra("TWITTER_ERROR",e.getMessage());
+            sendBroadcast(newIntent);
+
         } finally {
             if (db != null) {
                 db.close();

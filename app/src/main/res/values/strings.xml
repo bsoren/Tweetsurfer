@@ -21,5 +21,8 @@
     <string name="btn_share">Share</string>
     <string name="post_message">Post your message</string>
     <string name="postTweet">send</string>
+    <string name="username_summary">username is blank</string>
+    <string name="sync_interval_summary">15</string>
+    <string name="tweet_details">Tweet Details</string>
 
 </resources>
