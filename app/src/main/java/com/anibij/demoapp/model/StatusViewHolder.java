@@ -14,8 +14,8 @@ import com.anibij.demoapp.R;
  */
 public class StatusViewHolder extends RecyclerView.ViewHolder{
 
-    protected ImageView profileImage, mediaImage;
-    protected TextView user, message, createdAt,retweetBy,retweetCount,favCount;
+    protected ImageView profileImage, mediaImage, likeButtonView;
+    protected TextView user, message, createdAt, retweetBy, retweetCount, favCount, screenNameView;
     protected RelativeLayout mRelativeLayout,mRelativeLayout2;
     protected LinearLayout mLinearLayout;
     protected LinearLayout retweetLinearLayout;
@@ -34,11 +34,10 @@ public class StatusViewHolder extends RecyclerView.ViewHolder{
         retweetBy = (TextView) itemView.findViewById(R.id.retweetBy);
         retweetCount = (TextView) itemView.findViewById(R.id.reTweetCount);
         favCount = (TextView) itemView.findViewById(R.id.favCount);
+        screenNameView = (TextView) itemView.findViewById(R.id.list_item_text_screen_name);
         retweetLinearLayout = (LinearLayout) itemView.findViewById(R.id.retweetLinearLayout);
+        likeButtonView = (ImageView) itemView.findViewById(R.id.likeButton);
 
     }
-
-
-
 
 }

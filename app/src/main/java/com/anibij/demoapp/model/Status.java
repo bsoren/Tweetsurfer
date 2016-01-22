@@ -15,8 +15,10 @@ public class Status {
     private int moreItems = 0;
     private String retweetBy;
     private int retweetCount,favCount;
+    private String screenName;
+    private boolean favourite;
 
-    public Status(String id, String user, String message, long createdAt, String profileImageUrl,String mediaImageUrl,String retweetBy,int retweetCount,int favCount) {
+    public Status(String id, String user, String message, long createdAt, String profileImageUrl, String mediaImageUrl, String retweetBy, int retweetCount, int favCount, String screenName) {
         this.id = id;
         this.user = user;
         this.message = message;
@@ -26,6 +28,7 @@ public class Status {
         this.retweetBy =  retweetBy;
         this.retweetCount =  retweetCount;
         this.favCount = favCount;
+        this.screenName = screenName;
     }
 
     public Status(String default_value){
@@ -116,6 +119,23 @@ public class Status {
 
     public void setFavCount(int favCount) {
         this.favCount = favCount;
+    }
+
+
+    public String getScreenName() {
+        return screenName;
+    }
+
+    public void setScreenName(String screenName) {
+        this.screenName = screenName;
+    }
+
+    public boolean isFavourite() {
+        return favourite;
+    }
+
+    public void setFavourite(boolean favourite) {
+        this.favourite = favourite;
     }
 
     @Override

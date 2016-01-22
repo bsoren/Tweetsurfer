@@ -8,7 +8,7 @@ public class StatusContract {
 	// DB specific constants
 	// DB specific constants
 	public static final String DB_NAME = "tweetsurfer_timeline.db"; // 1
-	public static final int DB_VERSION = 3; // old 2
+	public static final int DB_VERSION = 5; // old 4
 	public static final String TABLE = "status"; // 3
 
 	public static final String UPDATE_INTERVAL = "UPDATE_INTERVAL";
@@ -27,6 +27,8 @@ public class StatusContract {
 
 	public static final String STATUS_ID =  "STATUS_ID";
 
+	public static final String TAB_FRAGMENT = "TAB_FRAGMENT";
+
 
 
 	public class Column { // 5
@@ -40,5 +42,7 @@ public class StatusContract {
 		public static final String RETWEET_BY = "retweet_by";
 		public static final String FAV_COUNT = "fav_count";
 		public static final String RETWEET_COUNT = "retweet_count";
+		public static final String SCREEN_NAME = "screen_name";
+		public static final String IS_FAVOURITE = "is_favourite";
 	}
 }

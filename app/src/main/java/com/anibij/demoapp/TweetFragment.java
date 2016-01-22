@@ -2,12 +2,10 @@ package com.anibij.demoapp;
 
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -27,7 +25,6 @@ import android.widget.Toast;
 
 import com.anibij.demoapp.Utils.AppPrefrences;
 import com.anibij.demoapp.Utils.ConnectionDetector;
-import com.anibij.demoapp.listener.RecyclerItemClickListener;
 import com.anibij.demoapp.model.Status;
 import com.anibij.demoapp.model.StatusAdapter;
 import com.anibij.demoapp.model.StatusContract;
@@ -61,6 +58,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private Button scrollTop;
 
+
     // Internet Connection detector
     private ConnectionDetector cd;
 
@@ -68,6 +66,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
     AlertDialogManager alert = new AlertDialogManager();
 
     private List<Status> mStatusList;
+    Handler uiHandler;
 
 
     private Context mContext;
@@ -90,6 +89,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
         mContext = getActivity();
         mContentResolver = getActivity().getContentResolver();
         mSharedPreferences = mContext.getSharedPreferences(AppPrefrences.PREF_NAME, 0);
+        uiHandler = new Handler();
 
         View view = inflater.inflate(R.layout.tweet_fragment, container, false);
 
@@ -130,7 +130,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
                 cd = new ConnectionDetector(mContext);
                 boolean isInternetAvailable = cd.isConnectingToInternet();
 
-               // Toast.makeText(mContext,"Internet Available? "+isInternetAvailable,Toast.LENGTH_SHORT).show();
+                // Toast.makeText(mContext,"Internet Available? "+isInternetAvailable,Toast.LENGTH_SHORT).show();
 
                 if (!isInternetAvailable) {
 
@@ -164,8 +164,9 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
         // use a linear layout manager
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        // RecyclerView Item Click
 
+        /*
+        // RecyclerView Item Click
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(mContext,
                 new RecyclerItemClickListener.OnItemClickListener() {
 
@@ -202,6 +203,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
                             //mAdapter.notifyItemChanged(position);
                         }
                         if (mAdapter.getItemViewType(position) == 0) {
+
                             Toast.makeText(mContext, "Tweet Clicked", Toast.LENGTH_SHORT).show();
                             Status status = mStatusList.get(position);
                             long statusId = Long.valueOf(status.getId());
@@ -211,14 +213,15 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
                             startActivity(detailIntent);
                         }
 
+
                     }
 
 
                 }));
 
-
+           */
         // create an Object for Adapter
-        mAdapter = new StatusAdapter(mContext, mStatusList);
+        mAdapter = new StatusAdapter(mContext, mStatusList, uiHandler);
         //mAdapter.setCustomDataAdapter(mAdapter);
 
         if (mStatusList.isEmpty()) {

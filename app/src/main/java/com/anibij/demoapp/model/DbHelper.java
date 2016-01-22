@@ -16,7 +16,7 @@ public class DbHelper extends SQLiteOpenHelper { // 1
 	// Called only once first time we create the database
 	@Override
         public void onCreate(SQLiteDatabase db) {
-                String sql = String.format("create table %s (%s int primary key, %s text,%s text, %s long,%s text,%s text,%s int,%s text,%s int,%s int)",
+            String sql = String.format("create table %s (%s int primary key, %s text,%s text, %s long,%s text,%s text,%s int,%s text,%s int,%s int,%s text,%s int)",
                         StatusContract.TABLE,
                         StatusContract.Column.ID,
                         StatusContract.Column.USER,
@@ -27,7 +27,9 @@ public class DbHelper extends SQLiteOpenHelper { // 1
                         StatusContract.Column.MORE_ITEMS,
                         StatusContract.Column.RETWEET_BY,
                         StatusContract.Column.RETWEET_COUNT,
-                        StatusContract.Column.FAV_COUNT
+                    StatusContract.Column.FAV_COUNT,
+                    StatusContract.Column.SCREEN_NAME,
+                    StatusContract.Column.IS_FAVOURITE
                 );
                         // 3
                 Log.d(TAG, "onCreate with SQL: " + sql);
@@ -40,8 +42,10 @@ public class DbHelper extends SQLiteOpenHelper { // 1
 		// 5
 		// Typically you do ALTER TABLE ...
             Log.d(TAG,"****** Dropping Table ****** ");
-		db.execSQL("drop table if exists " + StatusContract.TABLE);
-		onCreate(db);
+            //db.execSQL("drop table if exists " + StatusContract.TABLE);
+            //onCreate(db);
+            String query = String.format("alter table %s add column %s", StatusContract.TABLE, StatusContract.Column.IS_FAVOURITE);
+            db.execSQL(query);
 
 	}
 

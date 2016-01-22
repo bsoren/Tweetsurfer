@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="Inbox"
-          android:id="@+id/nav_item_inbox"
-          android:icon="@drawable/inbox"/>
+    <item
+        android:title="Timeline"
+        android:id="@+id/nav_item_timeline"
+        android:icon="@drawable/timeline"/>
 
-    <item android:title="Sent"
-          android:id="@+id/nav_item_sent"
-          android:icon="@drawable/sent"/>
+    <item
+        android:title="Mentions"
+        android:id="@+id/nav_item_mentions"
+        android:icon="@drawable/email"/>
 
-    <item android:title="Drafts"
-          android:id="@+id/nav_item_draft"
-          android:icon="@drawable/draft"/>
+    <item
+        android:title="Messages"
+        android:id="@+id/nav_item_messages"
+        android:icon="@drawable/message"/>
+
+    <item
+        android:title="Likes"
+        android:id="@+id/nav_item_likes"
+        android:icon="@drawable/star"/>
 
 
     <item android:title="Others">

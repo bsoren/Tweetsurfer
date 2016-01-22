@@ -7,12 +7,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.anibij.demoapp.model.StatusContract;
 import com.anibij.demoapp.model.StatusListLoader;
 
 
@@ -25,6 +27,8 @@ public class TabFragment extends Fragment {
     public static int int_items = 4 ;
     TabFragment.OnDrawerIconClick activity;
 
+    ActionBar supportActionBar;
+
 
 
     public interface OnDrawerIconClick{
@@ -35,7 +39,36 @@ public class TabFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Timeline");
+        supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+
+        int arg = getArguments().getInt(StatusContract.TAB_FRAGMENT);
+
+        switch (arg) {
+            case 0:
+                viewPager.setCurrentItem(0, true);
+                break;
+
+            case 1:
+                viewPager.setCurrentItem(1, true);
+                break;
+            case 2:
+                viewPager.setCurrentItem(2, true);
+                break;
+            case 3:
+                viewPager.setCurrentItem(3, true);
+                break;
+            default:
+
+        }
+
+
+
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
 
     }
 
@@ -59,6 +92,44 @@ public class TabFragment extends Fragment {
          *Set an Apater for the View Pager
          */
         viewPager.setAdapter(new MyAdapter(getChildFragmentManager()));
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+                String title = "Timeline";
+
+                switch (position) {
+                    case 0:
+                        title = "Timeline";
+                        break;
+                    case 1:
+                        title = "Mentions";
+                        break;
+                    case 2:
+                        title = "Messages";
+                        break;
+                    case 3:
+                        title = "Likes";
+                        break;
+                    default:
+
+                }
+
+                supportActionBar.setTitle(title);
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
 
         /**
          * Now , this is a workaround ,
@@ -122,10 +193,18 @@ public class TabFragment extends Fragment {
         public Fragment getItem(int position)
         {
             switch (position){
-                case 0 : return new TweetFragment();
-                case 1 : return new PrimaryFragment();
-                case 2 : return new PrimaryFragment();
-                case 3 : return new PrimaryFragment();
+                case 0:
+                    //((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Timeline");
+                    return new TweetFragment();
+                case 1:
+                    //((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Mentions");
+                    return new MentionFragment();
+                case 2:
+                    //((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Messages");
+                    return new DirectMessageFragment();
+                case 3:
+                    //((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Likes");
+                    return new FavouriteFragmentWithLoader();
             }
             return null;
         }

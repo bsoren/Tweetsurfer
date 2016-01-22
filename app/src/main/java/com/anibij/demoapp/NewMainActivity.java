@@ -85,9 +85,14 @@ public class NewMainActivity extends AppCompatActivity implements TabFragment.On
          * Here , we are inflating the TabFragment as the first Fragment
          */
 
+        Bundle bundle = new Bundle();
+        bundle.putInt(StatusContract.TAB_FRAGMENT, 0);
+        TabFragment fragment = new TabFragment();
+        fragment.setArguments(bundle);
+
         mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
-        mFragmentTransaction.replace(R.id.containerView, new TabFragment()).commit();
+        mFragmentTransaction.replace(R.id.containerView, fragment).commit();
 
         /**
          * Setup click events on the Navigation View Items.
@@ -105,16 +110,50 @@ public class NewMainActivity extends AppCompatActivity implements TabFragment.On
 
                 mDrawerLayout.closeDrawers();
 
+                if (menuItem.getItemId() == R.id.nav_item_timeline) {
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(StatusContract.TAB_FRAGMENT, 0);
+                    TabFragment fragment = new TabFragment();
+                    fragment.setArguments(bundle);
 
-                if (menuItem.getItemId() == R.id.nav_item_sent) {
-//                    FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-//                    fragmentTransaction.replace(R.id.containerView,new SentFragment()).commit();
+                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
+                    xfragmentTransaction.replace(R.id.containerView, fragment).commit();
+                }
+
+                if (menuItem.getItemId() == R.id.nav_item_mentions) {
+
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(StatusContract.TAB_FRAGMENT, 1);
+                    TabFragment fragment = new TabFragment();
+                    fragment.setArguments(bundle);
+
+                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
+                    xfragmentTransaction.replace(R.id.containerView, fragment).commit();
 
                 }
 
-                if (menuItem.getItemId() == R.id.nav_item_inbox) {
+                if (menuItem.getItemId() == R.id.nav_item_messages) {
+
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(StatusContract.TAB_FRAGMENT, 2);
+                    TabFragment fragment = new TabFragment();
+                    fragment.setArguments(bundle);
+
                     FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
-                    xfragmentTransaction.replace(R.id.containerView, new TabFragment()).commit();
+                    xfragmentTransaction.replace(R.id.containerView, fragment).commit();
+
+                }
+
+                if (menuItem.getItemId() == R.id.nav_item_likes) {
+
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(StatusContract.TAB_FRAGMENT, 3);
+                    TabFragment fragment = new TabFragment();
+                    fragment.setArguments(bundle);
+
+                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
+                    xfragmentTransaction.replace(R.id.containerView, fragment).commit();
+
                 }
 
                 return true;

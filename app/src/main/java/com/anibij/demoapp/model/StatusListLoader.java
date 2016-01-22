@@ -58,7 +58,9 @@ public class StatusListLoader extends AsyncTaskLoader<List<Status>> {
                 StatusContract.Column.MORE_ITEMS,
                 StatusContract.Column.RETWEET_BY,
                 StatusContract.Column.RETWEET_COUNT,
-                StatusContract.Column.FAV_COUNT
+                StatusContract.Column.FAV_COUNT,
+                StatusContract.Column.SCREEN_NAME,
+                StatusContract.Column.IS_FAVOURITE
         };
 
         mCursor = mContentResolver.query(mUri, projection, null, null, StatusContract.Column.CREATED_AT + " DESC");
@@ -78,9 +80,13 @@ public class StatusListLoader extends AsyncTaskLoader<List<Status>> {
                     String retweetBy =  mCursor.getString(mCursor.getColumnIndex(StatusContract.Column.RETWEET_BY));
                     int retweetCount = mCursor.getInt(mCursor.getColumnIndex(StatusContract.Column.RETWEET_COUNT));
                     int favCount = mCursor.getInt(mCursor.getColumnIndex(StatusContract.Column.FAV_COUNT));
+                    String screenName = mCursor.getString(mCursor.getColumnIndex(StatusContract.Column.SCREEN_NAME));
+                    int isFavouriteInt = mCursor.getInt(mCursor.getColumnIndex(StatusContract.Column.IS_FAVOURITE));
+                    boolean isFavouriteBool = (isFavouriteInt == 1) ? true : false;
 
-                    Status status = new Status(id, user, message, createdAt, profileImage,mediaImage,retweetBy,retweetCount,favCount);
+                    Status status = new Status(id, user, message, createdAt, profileImage, mediaImage, retweetBy, retweetCount, favCount, screenName);
                     status.setMoreItems(mCursor.getInt(mCursor.getColumnIndex(StatusContract.Column.MORE_ITEMS)));
+                    status.setFavourite(isFavouriteBool);
 
                     statusEntries.add(status);
 

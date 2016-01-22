@@ -23,7 +23,6 @@ import com.anibij.demoapp.model.DbHelper;
 import com.anibij.demoapp.model.StatusContract;
 import com.squareup.picasso.Picasso;
 
-import twitter4j.MediaEntity;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -65,7 +64,7 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
         retweetedByView = (TextView) view.findViewById(R.id.retweetBy);
         retweetCountView = (TextView) view.findViewById(R.id.reTweetCount);
         favCountView = (TextView) view.findViewById(R.id.favCount);
-        screenNameView =(TextView) view.findViewById(R.id.list_item_text_username);
+        screenNameView = (TextView) view.findViewById(R.id.list_item_text_screen_name);
 
         replyViewButton = (ImageView) view.findViewById(R.id.replyButton);
         reTweetViewButton = (ImageView) view.findViewById(R.id.re_tweetButton);
@@ -139,12 +138,18 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
         int favCount = cursor.getInt(cursor
                 .getColumnIndex(StatusContract.Column.FAV_COUNT));
 
+        String screenName = cursor.getString(cursor
+                .getColumnIndex(StatusContract.Column.SCREEN_NAME));
+
+
         textUser.setText(user);
         textMessage.setText(message);
         textCreatedAt.setText(DateUtils.getRelativeTimeSpanString(createdAt));
         retweetedByView.setText(retweetedBy);
         retweetCountView.setText(String.valueOf(retweetCount));
         favCountView.setText(String.valueOf(favCount));
+        screenNameView.setText("@" + screenName);
+
 
         Picasso.with(getActivity())
                 .load(profileImage)
@@ -235,10 +240,15 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
         @Override
         protected void onPostExecute(twitter4j.Status status) {
 
-			/* Dismiss the progress dialog after sharing */
-            pDialog.dismiss();
 
-            Toast.makeText(getActivity(), "Tweet Retrieved!", Toast.LENGTH_SHORT).show();
+            if (status == null) {
+                /* Dismiss the progress dialog after sharing */
+                pDialog.dismiss();
+                return;
+            }
+
+
+            // Toast.makeText(getActivity(), "Tweet Retrieved!", Toast.LENGTH_SHORT).show();
 
             User user = status.getUser();
             String retweetByUser = user.getName(); // user who did the retweet
@@ -253,19 +263,18 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
             user = status.getUser();
             int favCount = status.getFavoriteCount();
             int reTweetCount = status.getRetweetCount();
-            String screenName = user.getScreenName();
-            screenNameView.setText("@"+screenName);
+            boolean isFavourite = status.isFavorited();
             retweetCountView.setText(String.valueOf(reTweetCount));
             favCountView.setText(String.valueOf(favCount));
 
-            final MediaEntity[] mediaEntities = status.getMediaEntities();
-            StringBuilder sMediaUrls = new StringBuilder();
+            pDialog.dismiss();
 
             ContentValues values = new ContentValues();
 
             values.clear();
-            values.put(StatusContract.Column.RETWEET_COUNT,reTweetCount);
+            values.put(StatusContract.Column.RETWEET_COUNT, reTweetCount);
             values.put(StatusContract.Column.FAV_COUNT,favCount);
+            values.put(StatusContract.Column.IS_FAVOURITE, (isFavourite) ? 1 : 0);
 
             Uri updateUri = ContentUris.withAppendedId(StatusContract.CONTENT_URI, idToUpdate);
 

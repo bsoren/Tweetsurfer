@@ -199,6 +199,7 @@ public class RefreshService extends IntentService {
                 long replyToId = status.getInReplyToStatusId();
                 long replyToUserId = status.getInReplyToUserId();
                 String inReplyToScreenName = status.getInReplyToScreenName();
+                boolean isFavourite = status.isFavorited();
 
                 if (replyToId != -1 || replyToUserId != -1 || inReplyToScreenName != null) {
                     replyToCount++;
@@ -213,6 +214,7 @@ public class RefreshService extends IntentService {
                 user = status.getUser();
                 int favCount = status.getFavoriteCount();
                 int reTweetCount = status.getRetweetCount();
+                String screenName = user.getScreenName();
 
 
                 final MediaEntity[] mediaEntities = status.getMediaEntities();
@@ -242,6 +244,11 @@ public class RefreshService extends IntentService {
                 if(isRetweet){
                     values.put(StatusContract.Column.RETWEET_BY,retweetByUser);
                 }
+
+                if (isFavourite) {
+                    values.put(StatusContract.Column.IS_FAVOURITE, (isFavourite) ? 1 : 0);
+                    Log.d(TAG, "IS_FAVOURITE");
+                }
                 values.put(StatusContract.Column.RETWEET_COUNT,reTweetCount);
                 values.put(StatusContract.Column.FAV_COUNT,favCount);
                 values.put(StatusContract.Column.ID, id);
@@ -249,6 +256,7 @@ public class RefreshService extends IntentService {
                 values.put(StatusContract.Column.MESSAGE, status.getText());
                 values.put(StatusContract.Column.CREATED_AT, createdAt);
                 values.put(StatusContract.Column.PROFILE_IMAGE, user.getProfileImageURL());
+                values.put(StatusContract.Column.SCREEN_NAME, screenName);
                 values.put(StatusContract.Column.MORE_ITEMS, 0);
 
                 if (mediaEntities != null && mediaEntities.length > 0 && mediaEntities[0].getType().equals("photo")) {

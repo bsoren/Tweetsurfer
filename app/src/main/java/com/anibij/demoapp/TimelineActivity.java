@@ -147,7 +147,7 @@ public class TimelineActivity extends AppCompatActivity implements LoaderManager
 
                 }));
 
-        mStatusAdapter = new StatusAdapter(this, mStatusList);
+        mStatusAdapter = new StatusAdapter(this, mStatusList, new Handler());
 
         mRecyclerView.setAdapter(mStatusAdapter);
 
@@ -157,9 +157,6 @@ public class TimelineActivity extends AppCompatActivity implements LoaderManager
         if (!isLoggedIn) {
             startActivity(new Intent(this, LoginActivity.class));
         }
-
-
-
 
     }
 
