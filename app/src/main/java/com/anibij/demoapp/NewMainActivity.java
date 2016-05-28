@@ -102,11 +102,16 @@ public class NewMainActivity extends AppCompatActivity implements TabFragment.On
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
 
+                /*
                 //Checking if the item is in checked state or not, if not make it in checked state
-                if(menuItem.isChecked())
+                if(menuItem.isChecked()) {
+                   // mNavigationView.getMenu().clear();
                     menuItem.setChecked(false);
-                else
+                }
+                else {
                     menuItem.setChecked(true);
+                }
+                */
 
                 mDrawerLayout.closeDrawers();
 
@@ -263,7 +268,13 @@ public class NewMainActivity extends AppCompatActivity implements TabFragment.On
     }
 
     @Override
-    public void onDrawerClick() {
+    public void onDrawerClick(int position) {
 
+        int size = mNavigationView.getMenu().size();
+        for (int i = 0; i < size; i++) {
+            mNavigationView.getMenu().getItem(i).setChecked(false);
+        }
+
+        mNavigationView.getMenu().getItem(position).setChecked(true);
     }
 }
