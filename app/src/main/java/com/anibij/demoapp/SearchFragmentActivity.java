@@ -28,6 +28,8 @@ public class SearchFragmentActivity extends AppCompatActivity {
 
     mToolbar = (Toolbar) findViewById(R.id.search_fragment_activity_toolbar);
     setSupportActionBar(mToolbar);
+    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
 
     if (getSupportFragmentManager().findFragmentById(R.id.search_fragment_activity_framelayout) == null) {
       getSupportFragmentManager().beginTransaction()

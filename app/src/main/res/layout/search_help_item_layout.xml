@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/list_layout2"
+
+                android:paddingTop="5dp"
+                android:paddingBottom="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f5eafa">
+
+    <ImageView
+        android:id="@+id/searchImage"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="3dp"
+        android:scaleType="fitStart"
+        android:src="@drawable/twitter_placeholder_image"
+        android:visibility="visible"/>
+
+    <!-- 1 -->
+    <TextView
+        android:id="@+id/searchName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/searchImage"
+        android:text="Search Twitter for "
+        android:textColor="@android:color/secondary_text_light"
+        android:textSize="15sp"/>
+
+    <TextView
+        android:id="@+id/searchText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="0dp"
+        android:layout_toRightOf="@+id/searchName"
+        android:text='"India"'
+        android:textColor="@android:color/secondary_text_light"
+        android:textSize="15sp"/>
+
+    <!-- 2 -->
+    <TextView
+        android:id="@+id/searchItems"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/searchImage"
+        android:layout_below="@+id/searchName"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:text="Tweets, People, Nearby"
+        android:textSize="12sp"
+        android:textColor="@android:color/secondary_text_light"/>
+
+    </RelativeLayout>

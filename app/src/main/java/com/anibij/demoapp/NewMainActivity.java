@@ -58,7 +58,6 @@ public class NewMainActivity extends AppCompatActivity implements TabFragment.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawerlayout_activity);
 
-
         final String[] from = new String[] {"cityName"};
         final int[] to = new int[] {android.R.id.text1};
         mAdapter = new SimpleCursorAdapter(this,

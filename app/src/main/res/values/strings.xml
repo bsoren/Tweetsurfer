@@ -34,4 +34,7 @@
     <string name="search_result">search result</string>
     <string name="filter">some value</string>
 
+    <string name="search_name">Search %1$s for</string>
+    <string name="title_condensed">search condensed</string>
+
 </resources>

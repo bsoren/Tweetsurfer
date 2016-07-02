@@ -15,9 +15,9 @@
 package com.anibij.demoapp;
 
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -31,6 +31,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.anibij.demoapp.model.SearchHelpAdapter;
+import com.anibij.demoapp.model.User;
+
 import java.util.ArrayList;
 
 public class SearchFragment extends ListFragment implements
@@ -38,17 +41,19 @@ public class SearchFragment extends ListFragment implements
     SearchView.OnCloseListener {
   private static final String STATE_QUERY="q";
   private static final String STATE_MODEL="m";
-  private static final String[] items= { "lorem", "ipsum", "dolor",
-      "sit", "amet", "consectetuer", "adipiscing", "elit", "morbi",
-      "vel", "ligula", "vitae", "arcu", "aliquet", "mollis", "etiam",
-      "vel", "erat", "placerat", "ante", "porttitor", "sodales",
-      "pellentesque", "augue", "purus" };
-  private ArrayList<String> words=null;
-  private ArrayAdapter<String> adapter=null;
+
+  private static final String[] searchName= { "Twitter", "@skvijay42","Another Person" };
+  private static final int[] searchImage = { R.drawable.twitter_search_image,R.drawable.twitter_placeholder_image,R.drawable.twitter_placeholder_image};
+  private static final String[] searchItems = { "Tweets, People, Nearby2", "Tweets,Mentions,Favourite,Messages","Tweets,People" };
+  private static final String searchText = "";
+
+  private ArrayAdapter<User> adapter=null;
   private CharSequence initialQuery=null;
   private SearchView sv=null;
   android.support.v7.widget.Toolbar toolbar;
   Context  context;
+  private ArrayList<User> users;
+  private ListView mListView;
 
   @Override
   public void onAttach(Context context) {
@@ -59,11 +64,17 @@ public class SearchFragment extends ListFragment implements
   @Override
   public void onActivityCreated(Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
+    mListView = getListView();
+    mListView.setVisibility(View.GONE);
+    int[] colors = {0, 0xFFFF0000, 0}; // red for the example
+    mListView.setDivider(new GradientDrawable(GradientDrawable.Orientation.RIGHT_LEFT, colors));
+    mListView.setDividerHeight(1);
+
     if (savedInstanceState == null) {
       initAdapter(null);
     }
     else {
-      initAdapter(savedInstanceState.getStringArrayList(STATE_MODEL));
+      initAdapter((ArrayList<User>) savedInstanceState.getSerializable(STATE_MODEL));
       initialQuery=savedInstanceState.getCharSequence(STATE_QUERY);
     }
 
@@ -79,7 +90,7 @@ public class SearchFragment extends ListFragment implements
     if (!sv.isIconified()) {
       state.putCharSequence(STATE_QUERY, sv.getQuery());
     }
-    state.putStringArrayList(STATE_MODEL, words);
+    state.putSerializable(STATE_MODEL, users);
   }
 
   @Override
@@ -94,7 +105,7 @@ public class SearchFragment extends ListFragment implements
   @Override
   public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
     if (event == null || event.getAction() == KeyEvent.ACTION_UP) {
-      adapter.add(v.getText().toString());
+      //adapter.add(v.getText().toString());
       v.setText("");
 
       InputMethodManager imm=
@@ -109,11 +120,16 @@ public class SearchFragment extends ListFragment implements
   @Override
   public boolean onQueryTextChange(String newText) {
     if (TextUtils.isEmpty(newText)) {
-      adapter.getFilter().filter("");
+      mListView.setVisibility(View.GONE);
     }
     else {
-      adapter.getFilter().filter(newText.toString());
+      mListView.setVisibility(View.VISIBLE);
+      for(User user:users){
+        user.setSearchText("\""+newText+"\"");
+      }
     }
+
+    adapter.notifyDataSetChanged();
 
     return(true);
   }
@@ -132,14 +148,15 @@ public class SearchFragment extends ListFragment implements
 
   @Override
   public void onListItemClick(ListView l, View v, int position, long id) {
-    Toast.makeText(getActivity(), adapter.getItem(position),
-                   Toast.LENGTH_LONG).show();
+    Toast.makeText(getActivity(),adapter.getItem(position).toString(),Toast.LENGTH_LONG).show();
   }
 
   private void configureSearchView(Menu menu) {
     MenuItem search=menu.findItem(R.id.search);
 
-    sv = (SearchView)MenuItemCompat.getActionView(search);
+   // sv = (SearchView)MenuItemCompat.getActionView(search);
+    sv = (SearchView)search.getActionView();
+    sv.setQueryHint("Enter text for search...");
     sv.setOnQueryTextListener(this);
     sv.setOnCloseListener(this);
     sv.setSubmitButtonEnabled(false);
@@ -152,22 +169,25 @@ public class SearchFragment extends ListFragment implements
     }
   }
 
-  private void initAdapter(ArrayList<String> startingPoint) {
+  private void initAdapter(ArrayList<User> startingPoint) {
     if (startingPoint == null) {
-      words=new ArrayList<String>();
+      users = new ArrayList<User>();
 
-      for (String s : items) {
-        words.add(s);
+      for (int i=0; i<searchName.length;i++) {
+        User user =  new User();
+        user.setName(searchName[i]);
+        user.setImageName(new Integer(searchImage[i]).toString());
+        user.setSearchItems(searchItems[i]);
+        user.setSearchText("");
+
+        users.add(user);
       }
     }
     else {
-      words=startingPoint;
+      users = startingPoint;
     }
 
-    adapter=
-        new ArrayAdapter<String>(getActivity(),
-                                 android.R.layout.simple_list_item_1,
-                                 words);
+    adapter = new SearchHelpAdapter(getActivity(),users);
 
     setListAdapter(adapter);
   }

@@ -38,6 +38,7 @@
 
         <activity
             android:name=".SearchFragmentActivity"
+            android:parentActivityName=".NewMainActivity"
             android:label="@string/search_title"/>
 
         <activity
