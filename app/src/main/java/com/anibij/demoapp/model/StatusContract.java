@@ -44,5 +44,6 @@ public class StatusContract {
 		public static final String RETWEET_COUNT = "retweet_count";
 		public static final String SCREEN_NAME = "screen_name";
 		public static final String IS_FAVOURITE = "is_favourite";
+		public static final String IS_RETWEETED_BY_ME = "is_retweeted_by_me" ;
 	}
 }

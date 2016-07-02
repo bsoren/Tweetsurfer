@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    package="com.anibij.demoapp"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest package="com.anibij.demoapp"
+          xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Permission - Internet Connect -->
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -27,27 +26,29 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
         <activity
-            android:name="com.anibij.demoapp.WebViewActivity"
+            android:name=".WebViewActivity"
             android:label="@string/app_name"/>
         <activity
-            android:name="com.anibij.demoapp.LoginActivity"
+            android:name=".LoginActivity"
             android:label="@string/app_name"/>
-
         <activity
-            android:name="com.anibij.demoapp.StatusActivity"
+            android:name=".StatusActivity"
             android:label="@string/post_message"/>
 
         <activity
-            android:name="com.anibij.demoapp.DetailsActivity"
+            android:name=".SearchFragmentActivity"
+            android:label="@string/search_title"/>
+
+        <activity
+            android:name=".DetailsActivity"
             android:label="@string/tweet_details"
             android:parentActivityName=".NewMainActivity">
-
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".NewMainActivity"/>
+
         </activity>
 
         <receiver android:name=".service.StatusObserver">
@@ -55,13 +56,12 @@
                 <action android:name="com.anibij.tweetsurferweetsurfer.NEW_STATUSES"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
-
         </receiver>
 
-        <service android:name="com.anibij.demoapp.service.RefreshService"/>
+        <service android:name=".service.RefreshService"/>
 
         <provider
-            android:name="com.anibij.demoapp.model.StatusProvider"
+            android:name=".model.StatusProvider"
             android:authorities="com.anibij.demoapp"
             android:exported="false"/>
     </application>

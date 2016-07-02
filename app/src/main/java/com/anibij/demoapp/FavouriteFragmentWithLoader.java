@@ -11,10 +11,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -26,6 +28,7 @@ import com.anibij.demoapp.model.MentionListViewAdapter;
 import com.anibij.demoapp.model.Status;
 import com.anibij.demoapp.model.StatusContract;
 import com.anibij.demoapp.view.AlertDialogManager;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +44,7 @@ public class FavouriteFragmentWithLoader extends Fragment implements LoaderManag
     private static final String consumerKey = "o7kn8lHPoThttJhOejus6r1wJ";
     private static final String consumerSecret = "EfL1dRYw0xw6lWYogM4A7kuwCSwl2eeCINA746qTT28SSJsJnb";
     private static final int LOADER_ID = 55;
+    private static final String TAG = FavouriteFragmentWithLoader.class.getSimpleName() ;
 
     private static SharedPreferences mSharedPreferences;
     SQLiteDatabase db;
@@ -76,7 +80,8 @@ public class FavouriteFragmentWithLoader extends Fragment implements LoaderManag
             StatusContract.Column.MESSAGE,
             StatusContract.Column.CREATED_AT,
             StatusContract.Column.PROFILE_IMAGE,
-            StatusContract.Column.SCREEN_NAME
+            StatusContract.Column.SCREEN_NAME,
+            StatusContract.Column.MEDIA_IMAGE
     };
 
     int[] to = {
@@ -85,7 +90,7 @@ public class FavouriteFragmentWithLoader extends Fragment implements LoaderManag
             R.id.list_item_text_created_at,
             R.id.profile_image,
             R.id.user_screen_name,
-
+            R.id.list_item_media_image
     };
 
 
@@ -121,6 +126,42 @@ public class FavouriteFragmentWithLoader extends Fragment implements LoaderManag
         });
 
         mSimpleCursorAdapter = new SimpleCursorAdapter(mContext, R.layout.list_row_mentions, null, columns, to);
+        mSimpleCursorAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+            @Override
+            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+
+                switch(view.getId()){
+                    case R.id.list_item_text_created_at:
+                        String createdDateString =
+                                DateUtils.getRelativeTimeSpanString(
+                                        cursor.getLong(cursor.getColumnIndex
+                                                (StatusContract.Column.CREATED_AT))).toString();
+                        ((TextView)view).setText(createdDateString);
+                        return true;
+
+                    case R.id.list_item_media_image:
+                        String mediaImageUrl =  cursor.getString(cursor.getColumnIndex(StatusContract.Column.MEDIA_IMAGE));
+                        Log.d(TAG,"MediaURL : "+mediaImageUrl);
+
+                        if (!mediaImageUrl.equals("NO_IMAGE")) {
+
+                            Log.d(TAG,"Loading Image : ");
+                            ((ImageView)view).setVisibility(View.VISIBLE);
+                            Picasso.with(mContext).load(mediaImageUrl)
+                                    .error(R.drawable.no_image)
+                                    .placeholder(R.drawable.image_loading_animation).into(((ImageView)view));
+
+                        } else {
+                            ((ImageView)view).setVisibility(View.GONE);
+                            Log.d(TAG, " Image Gone : ");
+                            ((ImageView)view).setImageResource(R.drawable.no_image);
+                        }
+
+                        return true;
+                }
+                return false;
+            }
+        });
         listview.setAdapter(mSimpleCursorAdapter);
 
         //Initializing loader

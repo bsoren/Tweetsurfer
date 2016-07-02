@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,9 +39,12 @@ public class StatusActivity extends Activity {
 
 
 
-    private TextView mShareEditText;
+    private EditText mShareEditText;
     private Button mShareButton;
     private TextView mUserName;
+    String tweetIdString="";
+    String userScreenName="";
+    String message = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +54,7 @@ public class StatusActivity extends Activity {
         mSharedPreferences = getSharedPreferences(PREF_NAME,0);
         String username = mSharedPreferences.getString(PREF_USER_NAME,"None");
 
-        mShareEditText = (TextView) findViewById(R.id.share_text);
+        mShareEditText = (EditText) findViewById(R.id.share_text);
 
         mUserName = (TextView) findViewById(R.id.user_name);
         mUserName.setText(username);
@@ -62,12 +66,45 @@ public class StatusActivity extends Activity {
             public void onClick(View v) {
 
                 String status = mShareEditText.getText().toString();
-                new UpdateTwitterStatus().execute(status);
+                if(userScreenName.length() > 0){
+                    String statusIdString = tweetIdString;
+                    new UpdateTwitterStatus().execute(status,statusIdString);
+                }else {
+                    String statusIdString = tweetIdString;
+                    new UpdateTwitterStatus().execute(status,statusIdString);
+                }
 
             }
         });
 
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // call helper method
+        setupTweet();
+    }
+
+    private void setupTweet() {
+
+        Bundle extras = getIntent().getExtras();
+        if(extras != null){
+            tweetIdString =  extras.getString("TWEET_ID","");
+            userScreenName = extras.getString("TWEET_USER", "");
+            message = extras.getString("TWEET_MESSAGE","");
+            if(!message.isEmpty()){
+                mShareEditText.setText("http://twitter.com/"+userScreenName+"/status/"+tweetIdString);
+                mShareEditText.setSelection(0);
+            }else {
+                mShareEditText.setText("@" + userScreenName + " ");
+                mShareEditText.setSelection(mShareEditText.getText().length());
+            }
+
+        }else {
+            mShareEditText.setText("");
+        }
     }
 
     class UpdateTwitterStatus extends AsyncTask<String, String, Void> {
@@ -85,6 +122,7 @@ public class StatusActivity extends Activity {
         protected Void doInBackground(String... args) {
 
             String status = args[0];
+            String statusIdString =  args[1];
             try {
                 ConfigurationBuilder builder = new ConfigurationBuilder();
                 builder.setOAuthConsumerKey(consumerKey);
@@ -102,13 +140,20 @@ public class StatusActivity extends Activity {
                 StatusUpdate statusUpdate = new StatusUpdate(status);
                 //InputStream is = getResources().openRawResource(R.drawable.lakeside_view);
                 //statusUpdate.setMedia("test.jpg", is);
-
-                twitter4j.Status response = twitter.updateStatus(statusUpdate);
+                twitter4j.Status response;
+                if(statusIdString != null && statusIdString.length() > 0) {
+                    long statusId = Long.valueOf(statusIdString);
+                    response =  twitter.updateStatus(statusUpdate.inReplyToStatusId(statusId));
+                }else{
+                    response = twitter.updateStatus(statusUpdate);
+                }
 
                 Log.d("Status", response.getText());
 
             } catch (TwitterException e) {
                 Log.d("Failed to post!", e.getMessage());
+                String errorMessage = e.getErrorMessage();
+                Toast.makeText(StatusActivity.this,errorMessage,Toast.LENGTH_SHORT).show();
             }
             return null;
         }

@@ -1,5 +1,6 @@
 package com.anibij.demoapp.model;
 
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -13,21 +14,26 @@ import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.anibij.demoapp.DetailsActivity;
 import com.anibij.demoapp.R;
+import com.anibij.demoapp.StatusActivity;
 import com.anibij.demoapp.service.RefreshService;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 import twitter4j.Twitter;
+import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
 import twitter4j.conf.ConfigurationBuilder;
@@ -37,7 +43,7 @@ import twitter4j.conf.ConfigurationBuilder;
 /**
  * Created by bsoren on 02-Nov-15.
  */
-public class StatusAdapter extends RecyclerView.Adapter {
+public class StatusAdapter extends RecyclerView.Adapter implements View.OnCreateContextMenuListener{
 
     private static final String consumerKey = "o7kn8lHPoThttJhOejus6r1wJ";
     private static final String consumerSecret = "EfL1dRYw0xw6lWYogM4A7kuwCSwl2eeCINA746qTT28SSJsJnb";
@@ -132,6 +138,56 @@ public class StatusAdapter extends RecyclerView.Adapter {
             ((StatusViewHolder) holder).favCount.setText(String.valueOf(status.getFavCount()));
             ((StatusViewHolder) holder).screenNameView.setText("@" + status.getScreenName());
 
+            //((StatusViewHolder) holder).retweetButtonView.setOnCreateContextMenuListener(this);
+
+            ((StatusViewHolder) holder).retweetButtonView.setOnClickListener(new View.OnClickListener(){
+
+                @Override
+                public void onClick(View v) {
+
+                    final Dialog dialog =  new Dialog(mContext);
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(R.layout.retweet_popup_menu);
+                    dialog.setCanceledOnTouchOutside(true);
+
+                    dialog.findViewById(R.id.menuItem1).setOnClickListener(new View.OnClickListener() {
+
+
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(mContext,"Retweet clicked ",Toast.LENGTH_SHORT).show();
+                            makeRetweet(String.valueOf(statusId), "true", String.valueOf(position));
+                            dialog.dismiss();
+
+                        }
+                    });
+
+                    dialog.findViewById(R.id.menuItem2).setOnClickListener(new View.OnClickListener(){
+
+
+                        @Override
+                        public void onClick(View v) {
+
+                            Toast.makeText(mContext,"Retweet with Comment clicked ",Toast.LENGTH_SHORT).show();
+
+                            Status replyStatus = mStatuses.get(position);
+                            Intent replyTo = new Intent(mContext,StatusActivity.class);
+                            replyTo.putExtra("TWEET_ID",replyStatus.getId());
+                            replyTo.putExtra("TWEET_USER",replyStatus.getScreenName());
+                            replyTo.putExtra("TWEET_MESSAGE",replyStatus.getMessage());
+                            mContext.startActivity(replyTo);
+
+                            dialog.dismiss();
+
+                        }
+                    });
+
+                    dialog.show();
+
+
+                }
+            });
+
 
             boolean isFavourite = status.isFavourite();
             if (isFavourite) {
@@ -171,6 +227,21 @@ public class StatusAdapter extends RecyclerView.Adapter {
 
                     }
                 }
+            });
+
+            ((StatusViewHolder) holder).replyButtonView.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    Log.d(TAG,"Clicked Reply To");
+                    Status replyStatus = mStatuses.get(position);
+                    Intent replyTo = new Intent(mContext,StatusActivity.class);
+                    replyTo.putExtra("TWEET_ID",replyStatus.getId());
+                    replyTo.putExtra("TWEET_USER",replyStatus.getScreenName());
+                    mContext.startActivity(replyTo);
+
+                }
+
             });
 
 
@@ -255,6 +326,11 @@ public class StatusAdapter extends RecyclerView.Adapter {
         new FavoriteToggleTask().execute(statusId, toggle, position);
     }
 
+    private synchronized  void makeRetweet(String statusId, String retweet,String position){
+        new RetweetTask().execute(statusId,retweet,position);
+    }
+
+
     @Override
     public int getItemCount() {
         return mStatuses.size();
@@ -275,6 +351,13 @@ public class StatusAdapter extends RecyclerView.Adapter {
            // Toast.makeText(mContext,"List is null",Toast.LENGTH_LONG).show();
         }
         notifyDataSetChanged();
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        menu.setHeaderTitle("Select The Action");
+        menu.add(0, v.getId(), 0, "Call");//groupId, itemId, order, title
+        menu.add(0, v.getId(), 0, "SMS");
     }
 
     private class FavoriteToggleTask extends AsyncTask<String, Void, twitter4j.Status> {
@@ -311,9 +394,10 @@ public class StatusAdapter extends RecyclerView.Adapter {
 
                 if (toggle.equals("true")) {
                     status = twitter.createFavorite(statusId);
-                } else {
+                } else{
                     status = twitter.destroyFavorite(statusId);
                 }
+
 
                 return status;
 
@@ -348,5 +432,110 @@ public class StatusAdapter extends RecyclerView.Adapter {
         }
     }
 
+    private class RetweetTask extends AsyncTask<String, Void, twitter4j.Status> {
+
+        long statusId;
+        String retweet;
+        int position;
+
+        @Override
+        protected twitter4j.Status doInBackground(String... params) {
+
+
+            try {
+
+                statusId = Long.valueOf(params[0]);
+                retweet = params[1];
+                position = Integer.valueOf(params[2]);
+
+                Log.d(TAG, "Updating Favourite statusId : " + statusId + " Toggle : " + retweet);
+
+                ConfigurationBuilder builder = new ConfigurationBuilder();
+                builder.setOAuthConsumerKey(consumerKey);
+                builder.setOAuthConsumerSecret(consumerSecret);
+
+                // Access Token
+                String access_token = mSharedPreferences.getString(PREF_KEY_OAUTH_TOKEN, "");
+                // Access Token Secret
+                String access_token_secret = mSharedPreferences.getString(PREF_KEY_OAUTH_SECRET, "");
+
+                AccessToken accessToken = new AccessToken(access_token, access_token_secret);
+                Twitter twitter = new TwitterFactory(builder.build()).getInstance(accessToken);
+
+                twitter4j.Status status;
+
+                if (retweet.equals("true")) {
+                    status = twitter.retweetStatus(statusId);
+                } else{
+                    status = twitter.destroyStatus(statusId);
+                }
+
+
+                return status;
+
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
+                Log.e(TAG,"Error Class : "+e.getCause());
+                int errorCode =  ((TwitterException)e).getErrorCode();
+                final String errorMessage = ((TwitterException)e).getMessage();
+                switch (errorCode){
+                    case 327:
+                        Log.d(TAG, "Already twitted");
+                        uiHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(mContext, errorMessage, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        break;
+                    default:
+                        Log.d(TAG, "Default");
+                        uiHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(mContext, errorMessage, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        break;
+
+                }
+                e.printStackTrace();
+            }
+
+            return null;
+
+        }
+
+        @Override
+        protected void onPostExecute(twitter4j.Status status) {
+
+            if (status == null) {
+                return;
+            }
+            super.onPostExecute(status);
+            boolean isRetweetedByMe = status.isRetweetedByMe();
+            String retweetedMessage =  status.getText();
+            long retweetedId =  status.getRetweetedStatus().getId();
+
+
+
+            Log.d(TAG,"isRetweetedByMe "+isRetweetedByMe+" : retweetedMessage");
+
+            Log.d(TAG,"Status is : "+status.toString());
+
+            ContentValues values = new ContentValues();
+            //values.put(StatusContract.Column.IS_RETWEETED_BY_ME, (isRetweetedByMe) ? 1 : 0);
+            values.put(StatusContract.Column.RETWEET_COUNT, status.getRetweetCount());
+            Uri updateUri = ContentUris.withAppendedId(StatusContract.CONTENT_URI, Long.valueOf(statusId));
+            int rowUpdated = mContentResolver.update(updateUri, values, null, null);
+
+            //mStatuses.get(position).setFavourite(isFavourite);
+            //mStatuses.get(position).setFavCount(status.getFavoriteCount());
+            //notifyItemChanged(position);
+            Log.d(TAG, "Row updated : " + rowUpdated);
+        }
+    }
 
 }

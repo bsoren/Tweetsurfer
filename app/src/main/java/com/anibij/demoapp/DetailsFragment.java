@@ -67,7 +67,7 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
         screenNameView = (TextView) view.findViewById(R.id.list_item_text_screen_name);
 
         replyViewButton = (ImageView) view.findViewById(R.id.replyButton);
-        reTweetViewButton = (ImageView) view.findViewById(R.id.re_tweetButton);
+        reTweetViewButton = (ImageView) view.findViewById(R.id.retweetButton);
         likeButtonView = (ImageView) view.findViewById(R.id.likeButton);
 
         mImageView = (ImageView) view.findViewById(R.id.list_item_profile_image);
@@ -182,7 +182,7 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
                 Log.d(TAG,"Reply button Clicked");
                 Toast.makeText(getActivity(),"Reply Clicked",Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.re_tweetButton :
+            case R.id.retweetButton :
                 Toast.makeText(getActivity(),"Retweet Clicked",Toast.LENGTH_SHORT).show();
                 break;
             case R.id.likeButton:

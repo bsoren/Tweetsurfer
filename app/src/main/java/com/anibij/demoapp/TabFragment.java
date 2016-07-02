@@ -32,7 +32,7 @@ public class TabFragment extends Fragment {
 
 
     public interface OnDrawerIconClick{
-        void onDrawerClick();
+        void onDrawerClick(int position);
     }
 
     @Override
@@ -121,6 +121,8 @@ public class TabFragment extends Fragment {
 
             @Override
             public void onPageSelected(int position) {
+
+                ((TabFragment.OnDrawerIconClick)getActivity()).onDrawerClick(position);
 
             }
 

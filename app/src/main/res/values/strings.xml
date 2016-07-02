@@ -27,5 +27,11 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="menu1">Retweet</string>
+    <string name="menu2">Retweet with Comment</string>
+    <string name="search_title">search</string>
+    <string name="search_hint">Enter search string</string>
+    <string name="search_result">search result</string>
+    <string name="filter">some value</string>
 
 </resources>

@@ -2,11 +2,15 @@ package com.anibij.demoapp;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.MatrixCursor;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -26,6 +30,7 @@ import com.squareup.picasso.Picasso;
 public class NewMainActivity extends AppCompatActivity implements TabFragment.OnDrawerIconClick {
 
     private static final String TAG = NewMainActivity.class.getSimpleName();
+    android.support.v7.widget.Toolbar toolbar;
 
     private StatusListLoader mStatusListLoader;
     DrawerLayout mDrawerLayout;
@@ -38,6 +43,13 @@ public class NewMainActivity extends AppCompatActivity implements TabFragment.On
     TextView mUserNameView;
     TextView mUserScreenNameView;
 
+    private static final String[] SUGGESTIONS = {
+            "Bauru", "Sao Paulo", "Rio de Janeiro",
+            "Bahia", "Mato Grosso", "Minas Gerais",
+            "Tocantins", "Rio Grande do Sul"
+    };
+    private SimpleCursorAdapter mAdapter;
+
 
 
     @Override
@@ -45,6 +57,16 @@ public class NewMainActivity extends AppCompatActivity implements TabFragment.On
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawerlayout_activity);
+
+
+        final String[] from = new String[] {"cityName"};
+        final int[] to = new int[] {android.R.id.text1};
+        mAdapter = new SimpleCursorAdapter(this,
+                android.R.layout.simple_list_item_1,
+                null,
+                from,
+                to,
+                CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 
         // SharedPreferences
         mSharedPreferences = getSharedPreferences(AppPrefrences.PREF_NAME,0);
@@ -172,7 +194,8 @@ public class NewMainActivity extends AppCompatActivity implements TabFragment.On
 
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name,
+
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,toolbar, R.string.app_name,
                 R.string.app_name){
             @Override
             public void syncState() {
@@ -214,6 +237,10 @@ public class NewMainActivity extends AppCompatActivity implements TabFragment.On
 
         switch (id) {
             case R.id.action_settings:
+                break;
+            case R.id.searchButton:
+                Toast.makeText(this,"Search Clicked",Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this,SearchFragmentActivity.class));
                 break;
             case R.id.refresh:
                 /* Getting since Id and passing it to RefreshService */
@@ -276,5 +303,16 @@ public class NewMainActivity extends AppCompatActivity implements TabFragment.On
         }
 
         mNavigationView.getMenu().getItem(position).setChecked(true);
+    }
+
+
+    // You must implements your logic to get data using OrmLite
+    private void populateAdapter(String query) {
+        final MatrixCursor c = new MatrixCursor(new String[]{ BaseColumns._ID, "cityName" });
+        for (int i=0; i<SUGGESTIONS.length; i++) {
+            if (SUGGESTIONS[i].toLowerCase().startsWith(query.toLowerCase()))
+                c.addRow(new Object[] {i, SUGGESTIONS[i]});
+        }
+        mAdapter.changeCursor(c);
     }
 }
