@@ -10,15 +10,6 @@ import com.anibij.demoapp.Utils.AppPrefrences;
 import java.util.ArrayList;
 import java.util.List;
 
-import twitter4j.MediaEntity;
-import twitter4j.Query;
-import twitter4j.QueryResult;
-import twitter4j.Status;
-import twitter4j.Twitter;
-import twitter4j.TwitterFactory;
-import twitter4j.auth.AccessToken;
-import twitter4j.conf.ConfigurationBuilder;
-
 /**
  * Created by bsoren on 03-Jul-16.
  */
@@ -56,78 +47,9 @@ public class SearchResultLoader extends AsyncTaskLoader<List<com.anibij.demoapp.
     @Override
     public List<com.anibij.demoapp.model.Status> loadInBackground() {
 
-
-        try {
-
-            ConfigurationBuilder builder = new ConfigurationBuilder();
-            builder.setOAuthConsumerKey(consumerKey);
-            builder.setOAuthConsumerSecret(consumerSecret);
-            builder.setJSONStoreEnabled(true);
-            builder.setIncludeMyRetweetEnabled(true);
-            // Access Token
-            String access_token = mSharedPreferences.getString(PREF_KEY_OAUTH_TOKEN, "");
-            // Access Token Secret
-            String access_token_secret = mSharedPreferences.getString(PREF_KEY_OAUTH_SECRET, "");
-
-            String prefSearchText = mSharedPreferences.getString(SearchFragment.SEARCH_TEXT,"");
-
-            AccessToken accessToken = new AccessToken(access_token, access_token_secret);
-            Twitter twitter = new TwitterFactory(builder.build()).getInstance(accessToken);
-
-            Log.d(TAG,"searchText is :"+prefSearchText);
-            Query query = new Query(prefSearchText);
-            query.setCount(MAX_SEARCH_RESULT);
-            query.setResultType(Query.ResultType.valueOf("recent"));
-            query.setLang("en");
-
-            QueryResult result = null;
-
-            result = twitter.search(query);
-            Log.d(TAG, "Search Result Size : "+result.getTweets().size());
-            mStatues = processStatus(result.getTweets());
-
-        }
-         catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return mStatues;
+        return new SearchUtility(mContext).fetchTwitterSearchTweets();
     }
 
-    private List<com.anibij.demoapp.model.Status> processStatus(List<Status> tweets) {
-        List<com.anibij.demoapp.model.Status> statusList = new ArrayList<>();
-
-        for (twitter4j.Status status : tweets) {
-            com.anibij.demoapp.model.Status newStatus = new com.anibij.demoapp.model.Status("default");
-            newStatus.setId(new Long(status.getId()).toString());
-            newStatus.setUser(status.getUser().getName());
-            newStatus.setCreatedAt(status.getCreatedAt().getTime());
-
-            boolean isRetweet =  status.isRetweet();
-
-            if(isRetweet){
-                 status = status.getRetweetedStatus();
-                 newStatus.setRetweetBy(status.getUser().getName());
-            }
-            newStatus.setMessage(status.getText());
-            newStatus.setProfileImageUrl(status.getUser().getProfileImageURL());
-            newStatus.setRetweetCount(status.getRetweetCount());
-            newStatus.setFavCount(status.getFavoriteCount());
-            newStatus.setScreenName(status.getUser().getScreenName());
-
-            MediaEntity[] mediaEntities = status.getMediaEntities();
-            if (mediaEntities != null && mediaEntities.length > 0 && mediaEntities[0].getType().equals("photo")) {
-                newStatus.setMediaImageUrl(mediaEntities[0].getMediaURL());
-            } else {
-                newStatus.setMediaImageUrl("NO_IMAGE");
-            }
-
-            statusList.add(newStatus);
-
-        }
-
-        return statusList;
-    }
 
     @Override
     public void onCanceled(List<com.anibij.demoapp.model.Status> statuses) {
