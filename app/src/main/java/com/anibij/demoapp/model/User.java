@@ -1,25 +1,14 @@
 package com.anibij.demoapp.model;
 
 /**
- * Created by bsoren on 02-Jul-16.
+ * Created by bsoren on 03-Jul-16.
  */
 public class User {
 
     private String name;
-    private String imageName;
-    private String searchItems;
-    private String searchText;
-
-    public User(String searchName, String searchImage, String searchItems, String searchText) {
-        this.name = searchName;
-        this.imageName = searchImage;
-        this.searchItems = searchItems;
-        this.searchText =  searchText;
-    }
-
-    public User(){
-
-    }
+    private String screenName;
+    private String profileImageUrl;
+    private String latestStatus;
 
     public String getName() {
         return name;
@@ -29,36 +18,37 @@ public class User {
         this.name = name;
     }
 
-    public String getImageName() {
-        return imageName;
+    public String getScreenName() {
+        return screenName;
     }
 
-    public void setImageName(String imageName) {
-        this.imageName = imageName;
+    public void setScreenName(String screenName) {
+        this.screenName = screenName;
     }
 
-    public String getSearchItems() {
-        return searchItems;
+    public String getProfileImageUrl() {
+        return profileImageUrl;
     }
 
-    public void setSearchItems(String searchItems) {
-        this.searchItems = searchItems;
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 
-    public String getSearchText() {
-        return searchText;
+    public String getLatestStatus() {
+        return latestStatus;
     }
 
-    public void setSearchText(String searchText) {
-        this.searchText = searchText;
+    public void setLatestStatus(String latestStatus) {
+        this.latestStatus = latestStatus;
     }
 
     @Override
     public String toString() {
         return "User{" +
                 "name='" + name + '\'' +
-                ", imageName='" + imageName + '\'' +
-                ", searchItems='" + searchItems + '\'' +
+                ", screenName='" + screenName + '\'' +
+                ", profileImageUrl='" + profileImageUrl + '\'' +
+                ", latestStatus='" + latestStatus + '\'' +
                 '}';
     }
 }

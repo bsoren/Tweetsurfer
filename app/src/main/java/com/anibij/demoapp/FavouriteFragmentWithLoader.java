@@ -85,9 +85,9 @@ public class FavouriteFragmentWithLoader extends Fragment implements LoaderManag
     };
 
     int[] to = {
-            R.id.list_item_text_user,
-            R.id.list_item_text_message,
-            R.id.list_item_text_created_at,
+            R.id.userName,
+            R.id.userLatestStatus,
+            R.id.user_add_image,
             R.id.profile_image,
             R.id.user_screen_name,
             R.id.list_item_media_image
@@ -131,7 +131,7 @@ public class FavouriteFragmentWithLoader extends Fragment implements LoaderManag
             public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
 
                 switch(view.getId()){
-                    case R.id.list_item_text_created_at:
+                    case R.id.user_add_image:
                         String createdDateString =
                                 DateUtils.getRelativeTimeSpanString(
                                         cursor.getLong(cursor.getColumnIndex

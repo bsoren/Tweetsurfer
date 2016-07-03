@@ -53,13 +53,13 @@ public class MentionListViewAdapter extends BaseAdapter {
             holder = new ViewHolder();
             convertView = mLayoutInflater.inflate(R.layout.list_row_mentions, null);
             // locate views in list_row
-            holder.userNameView = (TextView) convertView.findViewById(R.id.list_item_text_user);
-            holder.userScreenNameView = (TextView) convertView.findViewById(R.id.list_item_text_screen_name);
-            holder.createdAtView = (TextView) convertView.findViewById(R.id.list_item_text_created_at);
-            holder.messageView = (TextView) convertView.findViewById(R.id.list_item_text_message);
+            holder.userNameView = (TextView) convertView.findViewById(R.id.userName);
+            holder.userScreenNameView = (TextView) convertView.findViewById(R.id.user_screen_name);
+            holder.createdAtView = (TextView) convertView.findViewById(R.id.user_add_image);
+            holder.messageView = (TextView) convertView.findViewById(R.id.userLatestStatus);
             // holder.retweetCountView = (TextView) convertView.findViewById(R.id.reTweetCount);
             //holder.favCountView = (TextView) convertView.findViewById(R.id.favCount);
-            holder.userImageView = (ImageView) convertView.findViewById(R.id.list_item_profile_image);
+            holder.userImageView = (ImageView) convertView.findViewById(R.id.user_profile_image);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();

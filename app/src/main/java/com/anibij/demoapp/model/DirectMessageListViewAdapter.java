@@ -52,11 +52,11 @@ public class DirectMessageListViewAdapter extends BaseAdapter {
 
             convertView = mLayoutInflater.inflate(R.layout.list_row_messages, null);
             holder = new ViewHolder();
-            holder.createAtView = (TextView) convertView.findViewById(R.id.list_item_text_created_at);
-            holder.recipientImageView = (ImageView) convertView.findViewById(R.id.list_item_profile_image);
-            holder.recipientNameView = (TextView) convertView.findViewById(R.id.list_item_text_user);
-            holder.recipientScreenNameView = (TextView) convertView.findViewById(R.id.list_item_text_screen_name);
-            holder.textMessageView = (TextView) convertView.findViewById(R.id.list_item_text_message);
+            holder.createAtView = (TextView) convertView.findViewById(R.id.user_add_image);
+            holder.recipientImageView = (ImageView) convertView.findViewById(R.id.user_profile_image);
+            holder.recipientNameView = (TextView) convertView.findViewById(R.id.userName);
+            holder.recipientScreenNameView = (TextView) convertView.findViewById(R.id.user_screen_name);
+            holder.textMessageView = (TextView) convertView.findViewById(R.id.userLatestStatus);
             convertView.setTag(holder);
 
         } else {

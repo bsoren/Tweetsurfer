@@ -18,12 +18,12 @@ import java.util.ArrayList;
  *
  */
 
-public class SearchHelpAdapter extends ArrayAdapter<User>{
+public class SearchHelpAdapter extends ArrayAdapter<SearchItem>{
 
     private Context mContext;
 
-    public SearchHelpAdapter(Context context, ArrayList<User> users) {
-        super(context, R.layout.search_help_item_layout,users);
+    public SearchHelpAdapter(Context context, ArrayList<SearchItem> searchItems) {
+        super(context, R.layout.search_help_item_layout, searchItems);
         mContext = context;
     }
 
@@ -37,7 +37,7 @@ public class SearchHelpAdapter extends ArrayAdapter<User>{
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        User user =  getItem(position);
+        SearchItem searchItem =  getItem(position);
         SearchViewHolder viewHolder;
         if(convertView == null){
             viewHolder = new SearchViewHolder();
@@ -57,11 +57,11 @@ public class SearchHelpAdapter extends ArrayAdapter<User>{
         }
 
         // populate the data in the view holder
-        String searchTitle = mContext.getString(R.string.search_name,user.getName());
+        String searchTitle = mContext.getString(R.string.search_name, searchItem.getName());
         viewHolder.searchName.setText(searchTitle);
-        viewHolder.searchItem.setText(user.getSearchItems());
-        viewHolder.searchText.setText(user.getSearchText());
-        String image = user.getImageName();
+        viewHolder.searchItem.setText(searchItem.getSearchItems());
+        viewHolder.searchText.setText(searchItem.getSearchText());
+        String image = searchItem.getImageName();
         int imageInt =  new Integer(image);
 
         Picasso.with(mContext)

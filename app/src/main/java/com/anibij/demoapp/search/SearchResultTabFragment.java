@@ -15,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.anibij.demoapp.DirectMessageFragment;
 import com.anibij.demoapp.R;
 import com.anibij.demoapp.model.StatusContract;
 import com.anibij.demoapp.model.StatusListLoader;
@@ -197,10 +196,18 @@ public class SearchResultTabFragment extends Fragment {
                     return searchTweetFragment;
                 case 1:
                     //((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Mentions");
+                    Log.d(TAG,"Searhing people");
                     return new SearchPeopleFragment();
                 case 2:
                     //((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Messages");
-                    return new DirectMessageFragment();
+                   // return new DirectMessageFragment();
+                    Bundle bundle1 = new Bundle();
+                    bundle1.putString(SearchFragment.SEARCH_TEXT,searchText);
+
+                    SearchTweetFragment searchTweetFragment2 = new SearchTweetFragment();
+                    searchTweetFragment2.setArguments(bundle1);
+
+                    return searchTweetFragment2;
             }
             return null;
         }

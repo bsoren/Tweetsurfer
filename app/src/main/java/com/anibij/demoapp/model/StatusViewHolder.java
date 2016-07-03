@@ -28,16 +28,16 @@ public class StatusViewHolder extends RecyclerView.ViewHolder{
 
         //mLinearLayout = (LinearLayout)itemView.findViewById(R.id.list_layout);
         mRelativeLayout2 = (RelativeLayout)itemView.findViewById(R.id.list_layout2);
-        profileImage = (ImageView) itemView.findViewById(R.id.list_item_profile_image);
+        profileImage = (ImageView) itemView.findViewById(R.id.user_profile_image);
         mediaImage = (ImageView) itemView.findViewById(R.id.list_item_media_image);
 
-        user =  (TextView) itemView.findViewById(R.id.list_item_text_user);
-        message = (TextView) itemView.findViewById(R.id.list_item_text_message);
-        createdAt = (TextView) itemView.findViewById(R.id.list_item_text_created_at);
+        user =  (TextView) itemView.findViewById(R.id.userName);
+        message = (TextView) itemView.findViewById(R.id.userLatestStatus);
+        createdAt = (TextView) itemView.findViewById(R.id.user_add_image);
         retweetBy = (TextView) itemView.findViewById(R.id.retweetBy);
         retweetCount = (TextView) itemView.findViewById(R.id.reTweetCount);
         favCount = (TextView) itemView.findViewById(R.id.favCount);
-        screenNameView = (TextView) itemView.findViewById(R.id.list_item_text_screen_name);
+        screenNameView = (TextView) itemView.findViewById(R.id.user_screen_name);
         retweetLinearLayout = (LinearLayout) itemView.findViewById(R.id.retweetLinearLayout);
         likeButtonView = (ImageView) itemView.findViewById(R.id.likeButton);
         replyButtonView = (ImageView) itemView.findViewById(R.id.replyButton);

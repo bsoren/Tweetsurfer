@@ -11,59 +11,11 @@
     android:layout_marginTop="3dp"
     card_view:cardCornerRadius="4dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="0dp"
-        android:id="@+id/retweetLinearLayout"
-        android:background="#ffffff"
-        android:visibility="visible"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_weight="7"
-            android:orientation="horizontal"
-            >
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="22dp"
-                android:src="@drawable/retweet"/>
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginLeft="2dp"
-            android:layout_weight="1"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/retweetBy"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:textSize="10sp"
-                android:text="India Today Retweeted"
-                />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-
     <RelativeLayout
         android:id="@+id/list_layout2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#ffffff"
-        >
+        android:background="#ffffff">
 
 
         <ImageView
@@ -98,15 +50,13 @@
             android:textSize="10sp"/>
 
         <!-- 2 -->
-        <TextView
+        <ImageView
             android:id="@+id/user_add_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/userName"
-            android:layout_alignBottom="@+id/userName"
+            android:src="@android:drawable/ic_input_add"
+            android:layout_alignTop="@+id/userName"
             android:layout_alignParentRight="true"
-            android:text="10 minutes ago"
-            android:textSize="10sp"
             android:textColor="@android:color/secondary_text_light"/>
 
         <!-- 3 -->
@@ -114,7 +64,7 @@
             android:id="@+id/userLatestStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/user_add_image"
+            android:layout_below="@+id/userName"
             android:layout_marginBottom="2dp"
             android:layout_toRightOf="@+id/user_profile_image"
             android:autoLink="web"
@@ -124,17 +74,6 @@
                       Take that, Microsoft! http://t.co/123"
             android:textSize="12sp"/>
 
-
-        <ImageView
-            android:id="@+id/list_item_media_image"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/userLatestStatus"
-            android:layout_marginRight="5dp"
-            android:layout_toRightOf="@+id/user_profile_image"
-            android:scaleType="centerCrop"
-            android:src="@drawable/image_loading_animation"
-            android:visibility="gone"/>
     </RelativeLayout>
 
 

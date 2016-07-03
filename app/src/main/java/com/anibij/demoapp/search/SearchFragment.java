@@ -36,7 +36,7 @@ import android.widget.Toast;
 import com.anibij.demoapp.R;
 import com.anibij.demoapp.Utils.AppPrefrences;
 import com.anibij.demoapp.model.SearchHelpAdapter;
-import com.anibij.demoapp.model.User;
+import com.anibij.demoapp.model.SearchItem;
 
 import java.util.ArrayList;
 
@@ -52,12 +52,12 @@ public class SearchFragment extends ListFragment implements
   public static final String SEARCH_TEXT = "search_text";
   private static String searchText = "";
 
-  private ArrayAdapter<User> adapter=null;
+  private ArrayAdapter<SearchItem> adapter=null;
   private CharSequence initialQuery=null;
   private SearchView sv=null;
   android.support.v7.widget.Toolbar toolbar;
   Context  context;
-  private ArrayList<User> users;
+  private ArrayList<SearchItem> mSearchItems;
   private ListView mListView;
     private SharedPreferences mSharedPreferences;
 
@@ -82,7 +82,7 @@ public class SearchFragment extends ListFragment implements
       initAdapter(null);
     }
     else {
-      //initAdapter((ArrayList<User>) savedInstanceState.getSerializable(STATE_MODEL));
+      //initAdapter((ArrayList<SearchItem>) savedInstanceState.getSerializable(STATE_MODEL));
         initAdapter(null);
       initialQuery=savedInstanceState.getCharSequence(STATE_QUERY);
     }
@@ -99,7 +99,7 @@ public class SearchFragment extends ListFragment implements
     if (!sv.isIconified()) {
       state.putCharSequence(STATE_QUERY, sv.getQuery());
     }
-    //state.putSerializable(STATE_MODEL, users);
+    //state.putSerializable(STATE_MODEL, mSearchItems);
   }
 
   @Override
@@ -135,8 +135,8 @@ public class SearchFragment extends ListFragment implements
     }
     else {
       mListView.setVisibility(View.VISIBLE);
-      for(User user:users){
-        user.setSearchText("\""+newText+"\"");
+      for(SearchItem searchItem : mSearchItems){
+        searchItem.setSearchText("\""+newText+"\"");
         searchText = newText;
           mSharedPreferences.edit().putString(SearchFragment.SEARCH_TEXT,newText).apply();
       }
@@ -186,25 +186,25 @@ public class SearchFragment extends ListFragment implements
     }
   }
 
-  private void initAdapter(ArrayList<User> startingPoint) {
+  private void initAdapter(ArrayList<SearchItem> startingPoint) {
     if (startingPoint == null) {
-      users = new ArrayList<User>();
+      mSearchItems = new ArrayList<SearchItem>();
 
       for (int i=0; i<searchName.length;i++) {
-        User user =  new User();
-        user.setName(searchName[i]);
-        user.setImageName(new Integer(searchImage[i]).toString());
-        user.setSearchItems(searchItems[i]);
-        user.setSearchText("");
+        SearchItem searchItem =  new SearchItem();
+        searchItem.setName(searchName[i]);
+        searchItem.setImageName(new Integer(searchImage[i]).toString());
+        searchItem.setSearchItems(searchItems[i]);
+        searchItem.setSearchText("");
 
-        users.add(user);
+        mSearchItems.add(searchItem);
       }
     }
     else {
-      users = startingPoint;
+      mSearchItems = startingPoint;
     }
 
-    adapter = new SearchHelpAdapter(getActivity(),users);
+    adapter = new SearchHelpAdapter(getActivity(), mSearchItems);
 
     setListAdapter(adapter);
   }

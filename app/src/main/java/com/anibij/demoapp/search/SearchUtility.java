@@ -13,7 +13,9 @@ import java.util.List;
 import twitter4j.MediaEntity;
 import twitter4j.Query;
 import twitter4j.QueryResult;
+import twitter4j.ResponseList;
 import twitter4j.Twitter;
+import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.User;
 import twitter4j.auth.AccessToken;
@@ -43,12 +45,15 @@ public class SearchUtility {
 
     private static SharedPreferences mSharedPreferences;
 
+    private String prefSearchText = "";
+
     private Twitter mTwitter;
 
     public SearchUtility(Context context){
         mContext = context;
         mSharedPreferences = mContext.getSharedPreferences(AppPrefrences.PREF_NAME, 0);
         mTwitter = getTwitterInstance();
+        prefSearchText = mSharedPreferences.getString(SearchFragment.SEARCH_TEXT,"");
     }
 
     private Twitter getTwitterInstance(){
@@ -75,7 +80,6 @@ public class SearchUtility {
 
         try {
 
-            String prefSearchText = mSharedPreferences.getString(SearchFragment.SEARCH_TEXT,"");
             Log.d(TAG,"searchText is :"+prefSearchText);
 
             Query query = new Query(prefSearchText);
@@ -138,13 +142,36 @@ public class SearchUtility {
     }
 
 
-    public List<User> fetchTwitterSearchUsers(){
+    public List<com.anibij.demoapp.model.User> fetchTwitterSearchUsers(){
+        List<com.anibij.demoapp.model.User> retUserList = new ArrayList<>();
+        try {
+            Log.d(TAG,"Searching User "+prefSearchText);
+            ResponseList<User> users = mTwitter.searchUsers(prefSearchText,1);
+            retUserList = processRetrievedUsers(users);
 
-        Query query = new Query();
+        } catch (TwitterException e) {
+            e.printStackTrace();
+        }
 
-        return null;
+        return retUserList;
     }
 
+    private List<com.anibij.demoapp.model.User> processRetrievedUsers(ResponseList<User> users) {
+        List<com.anibij.demoapp.model.User> retUserList = new ArrayList<>();
+        Log.d(TAG, "User Size : "+users.size());
+
+        for(User user: users){
+            com.anibij.demoapp.model.User  myUser =  new com.anibij.demoapp.model.User();
+            myUser.setName(user.getName());
+            myUser.setScreenName(user.getScreenName());
+            myUser.setLatestStatus(user.getStatus().getText());
+            myUser.setProfileImageUrl(user.getProfileImageURL());
+
+            retUserList.add(myUser);
+        }
+
+        return retUserList;
+    }
 
 
 }

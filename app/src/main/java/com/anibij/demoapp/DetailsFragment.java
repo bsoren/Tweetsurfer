@@ -58,19 +58,19 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 
         mSharedPreferences = getActivity().getSharedPreferences(PREF_NAME,0);
 
-        textUser = (TextView) view.findViewById(R.id.list_item_text_user);
-        textMessage = (TextView) view.findViewById(R.id.list_item_text_message);
-        textCreatedAt = (TextView) view.findViewById(R.id.list_item_text_created_at);
+        textUser = (TextView) view.findViewById(R.id.userName);
+        textMessage = (TextView) view.findViewById(R.id.userLatestStatus);
+        textCreatedAt = (TextView) view.findViewById(R.id.user_add_image);
         retweetedByView = (TextView) view.findViewById(R.id.retweetBy);
         retweetCountView = (TextView) view.findViewById(R.id.reTweetCount);
         favCountView = (TextView) view.findViewById(R.id.favCount);
-        screenNameView = (TextView) view.findViewById(R.id.list_item_text_screen_name);
+        screenNameView = (TextView) view.findViewById(R.id.user_screen_name);
 
         replyViewButton = (ImageView) view.findViewById(R.id.replyButton);
         reTweetViewButton = (ImageView) view.findViewById(R.id.retweetButton);
         likeButtonView = (ImageView) view.findViewById(R.id.likeButton);
 
-        mImageView = (ImageView) view.findViewById(R.id.list_item_profile_image);
+        mImageView = (ImageView) view.findViewById(R.id.user_profile_image);
         mMediaImageView = (ImageView) view.findViewById(R.id.list_item_media_image);
 
         setClickListerner();
