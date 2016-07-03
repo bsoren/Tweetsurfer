@@ -23,6 +23,7 @@
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -35,26 +36,25 @@
         <activity
             android:name=".StatusActivity"
             android:label="@string/post_message"/>
-
         <activity
             android:name=".SearchFragmentActivity"
-            android:parentActivityName=".NewMainActivity"
-            android:label="@string/search_title"/>
-
+            android:label="@string/search_title"
+            android:parentActivityName=".NewMainActivity"/>
         <activity
             android:name=".DetailsActivity"
             android:label="@string/tweet_details"
             android:parentActivityName=".NewMainActivity">
+
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".NewMainActivity"/>
-
         </activity>
 
         <receiver android:name=".service.StatusObserver">
             <intent-filter>
                 <action android:name="com.anibij.tweetsurferweetsurfer.NEW_STATUSES"/>
+
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </receiver>
@@ -65,6 +65,9 @@
             android:name=".model.StatusProvider"
             android:authorities="com.anibij.demoapp"
             android:exported="false"/>
+
+        <activity android:name=".search.SearchResultActivity">
+        </activity>
     </application>
 
 </manifest>
