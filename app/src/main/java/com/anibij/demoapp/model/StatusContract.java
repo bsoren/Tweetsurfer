@@ -28,7 +28,7 @@ public class StatusContract {
 	public static final String STATUS_ID =  "STATUS_ID";
 
 	public static final String TAB_FRAGMENT = "TAB_FRAGMENT";
-
+	public static final String SEARCH_NEW_ITEMS = "com.anibij.demoapp.SEARCH_NEW_ITEMS";
 
 
 	public class Column { // 5

@@ -17,11 +17,11 @@ import com.anibij.demoapp.R;
 public class StatusViewHolder extends RecyclerView.ViewHolder{
 
     private static final String TAG = StatusViewHolder.class.getSimpleName();
-    protected ImageView profileImage, mediaImage, likeButtonView, replyButtonView,retweetButtonView;
-    protected TextView user, message, createdAt, retweetBy, retweetCount, favCount, screenNameView;
-    protected RelativeLayout mRelativeLayout,mRelativeLayout2;
-    protected LinearLayout mLinearLayout;
-    protected LinearLayout retweetLinearLayout;
+    public ImageView profileImage, mediaImage, likeButtonView, replyButtonView,retweetButtonView;
+    public TextView user, message, createdAt, retweetBy, retweetCount, favCount, screenNameView;
+    public RelativeLayout mRelativeLayout,mRelativeLayout2;
+    public LinearLayout mLinearLayout;
+    public LinearLayout retweetLinearLayout;
 
     public StatusViewHolder(View itemView) {
         super(itemView);

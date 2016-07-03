@@ -12,11 +12,13 @@
     http://commonsware.com/Android
  */
 
-package com.anibij.demoapp;
+package com.anibij.demoapp.search;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
+import com.anibij.demoapp.R;
 
 public class SearchFragmentActivity extends AppCompatActivity {
 

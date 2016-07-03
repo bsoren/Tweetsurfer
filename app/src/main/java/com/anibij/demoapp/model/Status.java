@@ -36,8 +36,8 @@ public class Status {
         this.user = "dummy_user";
         this.message = "message";
         this.createdAt = 0;
-        this.profileImageUrl = null;
-        this.mediaImageUrl =  null;
+        this.profileImageUrl = "http://pbs.twimg.com/profile_images/697679033937432576/JFN4zTh0_normal.png";
+        this.mediaImageUrl = "http://pbs.twimg.com/media/CmWBu7NVIAI1wIe.jpg";
 
     }
 

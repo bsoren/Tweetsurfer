@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.anibij.demoapp.Utils.AppPrefrences;
 import com.anibij.demoapp.model.StatusContract;
 import com.anibij.demoapp.model.StatusListLoader;
+import com.anibij.demoapp.search.SearchFragmentActivity;
 import com.anibij.demoapp.service.RefreshService;
 import com.squareup.picasso.Picasso;
 

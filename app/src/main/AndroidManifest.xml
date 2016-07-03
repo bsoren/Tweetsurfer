@@ -37,7 +37,7 @@
             android:name=".StatusActivity"
             android:label="@string/post_message"/>
         <activity
-            android:name=".SearchFragmentActivity"
+            android:name=".search.SearchFragmentActivity"
             android:label="@string/search_title"
             android:parentActivityName=".NewMainActivity"/>
         <activity
@@ -66,7 +66,7 @@
             android:authorities="com.anibij.demoapp"
             android:exported="false"/>
 
-        <activity android:name=".search.SearchResultActivity">
+        <activity android:name=".search.SearchResultActivity" android:parentActivityName=".NewMainActivity">
         </activity>
     </application>
 
