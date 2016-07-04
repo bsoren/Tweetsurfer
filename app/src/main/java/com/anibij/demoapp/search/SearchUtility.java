@@ -142,11 +142,11 @@ public class SearchUtility {
     }
 
 
-    public List<com.anibij.demoapp.model.User> fetchTwitterSearchUsers(){
+    public List<com.anibij.demoapp.model.User> fetchTwitterSearchUsers(int pageCount){
         List<com.anibij.demoapp.model.User> retUserList = new ArrayList<>();
         try {
             Log.d(TAG,"Searching User "+prefSearchText);
-            ResponseList<User> users = mTwitter.searchUsers(prefSearchText,1);
+            ResponseList<User> users = mTwitter.searchUsers(prefSearchText,pageCount);
             retUserList = processRetrievedUsers(users);
 
         } catch (TwitterException e) {
@@ -164,7 +164,7 @@ public class SearchUtility {
             com.anibij.demoapp.model.User  myUser =  new com.anibij.demoapp.model.User();
             myUser.setName(user.getName());
             myUser.setScreenName(user.getScreenName());
-            myUser.setLatestStatus(user.getStatus().getText());
+            myUser.setLatestStatus(user.getStatus()!=null?user.getStatus().getText():"");
             myUser.setProfileImageUrl(user.getProfileImageURL());
 
             retUserList.add(myUser);

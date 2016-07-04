@@ -1,3 +1,7 @@
+/**
+ * Obsolete - Don't  use
+ */
+
 package com.anibij.demoapp.search;
 
 import android.content.Context;
@@ -20,6 +24,7 @@ public class UserResultLoader extends AsyncTaskLoader<List<com.anibij.demoapp.mo
     private Context mContext;
     private String searchText;
     private List<com.anibij.demoapp.model.User> mUsers;
+    private int pageCount;
 
 
     private static SharedPreferences mSharedPreferences;
@@ -34,18 +39,19 @@ public class UserResultLoader extends AsyncTaskLoader<List<com.anibij.demoapp.mo
     private static final String consumerKey = "o7kn8lHPoThttJhOejus6r1wJ";
     private static final String consumerSecret = "EfL1dRYw0xw6lWYogM4A7kuwCSwl2eeCINA746qTT28SSJsJnb";
 
-    public UserResultLoader(Context context) {
+    public UserResultLoader(Context context, int pageCount) {
         super(context);
         mUsers = new ArrayList<>();
         this.mContext =  context;
+        this.pageCount = pageCount;
          /* Initialize application preferences */
         mSharedPreferences = mContext.getSharedPreferences(AppPrefrences.PREF_NAME, 0);
     }
 
     @Override
     public List<com.anibij.demoapp.model.User> loadInBackground() {
-
-        return new SearchUtility(mContext).fetchTwitterSearchUsers();
+        Log.d(TAG,"pageCount : "+pageCount++);
+        return new SearchUtility(mContext).fetchTwitterSearchUsers(pageCount);
     }
 
 
@@ -63,7 +69,6 @@ public class UserResultLoader extends AsyncTaskLoader<List<com.anibij.demoapp.mo
 
             Log.d(TAG,"Is Reset...");
             releaseResources(users);
-            return;
 
         }
 
@@ -85,7 +90,7 @@ public class UserResultLoader extends AsyncTaskLoader<List<com.anibij.demoapp.mo
     }
 
     private void releaseResources(List<com.anibij.demoapp.model.User> users) {
-        users = null;
+
     }
 
     @Override
@@ -135,6 +140,7 @@ public class UserResultLoader extends AsyncTaskLoader<List<com.anibij.demoapp.mo
         //At this point we can release the resources associated with 'mStatues'.
         if (mUsers != null) {
             releaseResources(mUsers);
+            mUsers = null;
         }
     }
 

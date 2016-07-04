@@ -6,11 +6,10 @@ package com.anibij.demoapp.search;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,33 +29,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class SearchPeopleFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<List<User>>,AbsListView.OnScrollListener {
+public class SearchUserFragment extends Fragment
+        implements AbsListView.OnScrollListener {
 
-    private static final String TAG = SearchPeopleFragment.class.getSimpleName() ;
-    private static final int LOADER_ID = 99;
-    int loaderid = 100;
+    private static final String TAG = SearchUserFragment.class.getSimpleName() ;
+
     private SharedPreferences mSharedPreferences;
     // Declare Variables
     private ListView mListView;
     ProgressBar mProgressBar;
     private SearchUserAdapter mSearchUserAdapter;
-    private UserResultLoader mResultLoader;
+    View progressBarView;
+
     private List<User> userList;
     ConnectionDetector cd;
-    Context mContext;
     TextView mNoRecordView;
     AlertDialogManager alert = new AlertDialogManager();
     private boolean loading = true;
     private int pageCount = 1;
     int previousTotal = 0;
+    private boolean isMoreItems = true;
+    private Context mContext;
 
-    public SearchPeopleFragment() {
+    public SearchUserFragment() {
         // Required empty public constructor
     }
 
-    public static SearchPeopleFragment newInstance() {
-        SearchPeopleFragment fragment = new SearchPeopleFragment();
+    public static SearchUserFragment newInstance() {
+        SearchUserFragment fragment = new SearchUserFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -66,7 +66,6 @@ public class SearchPeopleFragment extends Fragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         userList = new ArrayList<>();
-        mSharedPreferences = getActivity().getSharedPreferences(AppPrefrences.PREF_NAME, 0);
         Log.d(TAG,"onCreate");
     }
 
@@ -76,8 +75,7 @@ public class SearchPeopleFragment extends Fragment
         View v = inflater.inflate(R.layout.search_user_list, container, false);
         mListView = (ListView) v.findViewById(R.id.search_user_listview);
 
-        View progressBarView = inflater.inflate(R.layout.search_progress_bar,null);
-        mProgressBar = (ProgressBar)progressBarView.findViewById(R.id.search_progress_footer);
+        progressBarView = inflater.inflate(R.layout.search_progress_bar,null);
 
         return v;
     }
@@ -96,15 +94,13 @@ public class SearchPeopleFragment extends Fragment
 
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+        mSharedPreferences = getActivity().getSharedPreferences(AppPrefrences.PREF_NAME, 0);
         Log.d(TAG,"onActivityCreated");
 
         mSearchUserAdapter = new SearchUserAdapter(getActivity(),userList);
         mListView.setAdapter(mSearchUserAdapter);
         mListView.setOnScrollListener(this);
-        mListView.addFooterView(mProgressBar);
-
-        getActivity().getSupportLoaderManager().initLoader(LOADER_ID,null,this).forceLoad();
+        new SearchUserTask(1).execute();
 
     }
 
@@ -124,6 +120,7 @@ public class SearchPeopleFragment extends Fragment
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d(TAG,"onAttach");
+        mContext = context;
     }
 
     @Override
@@ -157,27 +154,6 @@ public class SearchPeopleFragment extends Fragment
     }
 
     @Override
-    public Loader<List<User>> onCreateLoader(int id, Bundle args) {
-        Log.d(TAG, "onCreateLoader");
-        Log.d(TAG,"isLoading : Count : "+ loading + " : "+pageCount);
-        mResultLoader =  new UserResultLoader(getActivity(),pageCount);
-        return mResultLoader;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<List<User>> loader, List<User> data) {
-        Log.d(TAG,"onLoadFinished "+data.size());
-        mSearchUserAdapter.setData(data);
-        //mListView.removeFooterView(mProgressBar);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<User>> loader) {
-        Log.d(TAG,"onLoaderReset");
-        mSearchUserAdapter.setData(null);
-    }
-
-    @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
 
     }
@@ -186,31 +162,73 @@ public class SearchPeopleFragment extends Fragment
     public void onScroll(AbsListView view, int firstVisibleItem,
                          int visibleItemCount, int totalItemCount) {
 
-        Log.d(TAG,"onscroll");
-        if(loading) {
-            if(totalItemCount > previousTotal) {
-                // the loading has finished
-                loading = false ;
-                previousTotal = totalItemCount ;
-            }
-        }
-
+        //Log.d(TAG,"onscroll, totalItem, pageCount : "+totalItemCount + " : "+pageCount);
         // check if the List needs more data
-        if(!loading && ((firstVisibleItem + visibleItemCount ) >= (totalItemCount))){
+        if(isMoreItems && !loading && ((firstVisibleItem + visibleItemCount ) >= (totalItemCount))){
             loading = true ;
-            mListView.addFooterView(mProgressBar);
-            pageCount++;
-            getActivity().getSupportLoaderManager().restartLoader(LOADER_ID,null,this);
+            loadMoreItems();
+
         }
     }
 
 
+    private void loadMoreItems(){
+        new SearchUserTask(pageCount).execute();
+    }
 
-//    @Override
-//    public void setUserVisibleHint(boolean isVisibleToUser) {
-//        super.setUserVisibleHint(isVisibleToUser);
-//        if(isVisibleToUser && !isLoading){
-//            getActivity().getSupportLoaderManager().initLoader(27, null, this);
-//        }
-//    }
+    private void incrementPageCount(){
+        pageCount++;
+    }
+
+    private class SearchUserTask extends AsyncTask<Void,Void,List<User>>{
+
+        private int pageCount;
+
+        @Override
+        protected List<User> doInBackground(Void... params) {
+            Log.d(TAG,"fetching users");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return new SearchUtility(getActivity()).fetchTwitterSearchUsers(pageCount);
+        }
+
+        public SearchUserTask(int pageCount) {
+            super();
+            this.pageCount = pageCount;
+        }
+
+        @Override
+        protected void onPostExecute(List<User> users) {
+            super.onPostExecute(users);
+            Log.d(TAG,"received pcount and users  "+pageCount+ " : " +users.size());
+            if(users.size()== 0){
+                isMoreItems = false;
+            }
+            if(users.size() > 0){
+                incrementPageCount();
+            }
+            mListView.removeFooterView(progressBarView);
+            mSearchUserAdapter.setData(users);
+            loading = false;
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mListView.addFooterView(progressBarView);
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+        }
+    }
 }

@@ -70,6 +70,11 @@ public class SearchResultTabFragment extends Fragment {
 
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -98,10 +103,10 @@ public class SearchResultTabFragment extends Fragment {
                 String title = "Tweets";
 
                 switch (position) {
-                    case 0:
+                    case 1:
                         title = "Tweets";
                         break;
-                    case 1:
+                    case 0:
                         title = "People";
                         break;
                     case 2:
@@ -142,10 +147,10 @@ public class SearchResultTabFragment extends Fragment {
                 for (int i = 0; i < tabLayout.getTabCount(); i++) {
 
                     switch(i){
-                        case 0 :
+                        case 1 :
                             iconDrawable = R.drawable.timeline;
                             break;
-                        case 1 :
+                        case 0:
                             iconDrawable = R.drawable.email;
                             break;
                         case 2 :
@@ -185,7 +190,7 @@ public class SearchResultTabFragment extends Fragment {
         public Fragment getItem(int position)
         {
             switch (position){
-                case 0:
+                case 1:
                     //((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Timeline");
                     Bundle bundle = new Bundle();
                     bundle.putString(SearchFragment.SEARCH_TEXT,searchText);
@@ -194,10 +199,10 @@ public class SearchResultTabFragment extends Fragment {
                     searchTweetFragment.setArguments(bundle);
 
                     return searchTweetFragment;
-                case 1:
+                case 0:
                     //((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Mentions");
                     Log.d(TAG,"Searhing people");
-                    return new SearchPeopleFragment();
+                    return new SearchUserFragment();
                 case 2:
                     //((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Messages");
                    // return new DirectMessageFragment();

@@ -1,6 +1,7 @@
 package com.anibij.demoapp.search;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,13 +22,14 @@ import java.util.List;
 
 public class SearchUserAdapter extends ArrayAdapter<User>{
 
+    private static final String TAG = SearchUserAdapter.class.getSimpleName();
     private Context mContext;
     private List<User> mUsers;
 
     public SearchUserAdapter(Context context, List<User> userItems) {
         super(context, R.layout.search_user_list_layout, userItems);
         mContext = context;
-        mUsers = userItems;
+        Log.d(TAG,"created SearchUserAdapter");
     }
 
     public static class SearchViewHolder{
@@ -37,6 +39,26 @@ public class SearchUserAdapter extends ArrayAdapter<User>{
         TextView userLastestStatus;
     }
 
+    public void setData(List<User> data) {
+
+        if (data != null && data.size() != 0) {
+            addAll(data);
+            notifyDataSetChanged();
+        }
+
+    }
+
+    /*
+    @Override
+    public User getItem(int position) {
+        return mUsers.get(position);
+    }
+
+    @Override
+    public int getCount() {
+        return (mUsers==null?0:mUsers.size());
+    }
+   */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
