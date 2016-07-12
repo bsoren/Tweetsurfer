@@ -27,10 +27,11 @@ import twitter4j.conf.ConfigurationBuilder;
 public class SearchUtility {
 
     private static final String TAG = SearchUtility.class.getSimpleName();
-    private static final int MAX_SEARCH_RESULT = 50;
+    private static final int MAX_SEARCH_RESULT = 20;
     private Context mContext;
     private String searchText;
     private List<Status> mStatues = null;
+    private long maxId;
 
     /* Shared preference keys */
     private static final String PREF_NAME = "sample_twitter_pref";
@@ -49,14 +50,14 @@ public class SearchUtility {
 
     private Twitter mTwitter;
 
-    public SearchUtility(Context context){
+    public SearchUtility(Context context) {
         mContext = context;
         mSharedPreferences = mContext.getSharedPreferences(AppPrefrences.PREF_NAME, 0);
         mTwitter = getTwitterInstance();
-        prefSearchText = mSharedPreferences.getString(SearchFragment.SEARCH_TEXT,"");
+        prefSearchText = mSharedPreferences.getString(SearchFragment.SEARCH_TEXT, "");
     }
 
-    private Twitter getTwitterInstance(){
+    private Twitter getTwitterInstance() {
         ConfigurationBuilder builder = new ConfigurationBuilder();
         builder.setOAuthConsumerKey(consumerKey);
         builder.setOAuthConsumerSecret(consumerSecret);
@@ -76,25 +77,31 @@ public class SearchUtility {
     /**
      * Method to search tweets
      */
-    public List<Status> fetchTwitterSearchTweets(){
-
+    public List<Status> fetchTwitterSearchTweets(long maxId) {
+        this.maxId = maxId;
         try {
 
-            Log.d(TAG,"searchText is :"+prefSearchText);
+            Log.d(TAG, "searchText is and maxId:" + prefSearchText + " : " + maxId);
+
+            Thread.sleep(1000);
 
             Query query = new Query(prefSearchText);
             query.setCount(MAX_SEARCH_RESULT);
-            query.setResultType(Query.ResultType.valueOf("recent"));
+            query.setResultType(Query.ResultType.recent);
+
+            if (maxId != Long.MAX_VALUE) {
+                query.setMaxId(maxId);
+            }
+
             query.setLang("en");
 
             QueryResult result = null;
 
             result = mTwitter.search(query);
-            Log.d(TAG, "Search Result Size : "+result.getTweets().size());
+            Log.d(TAG, "Search Result Size : " + result.getTweets().size());
             mStatues = processStatus(result.getTweets());
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return mStatues;
@@ -103,26 +110,35 @@ public class SearchUtility {
 
     /**
      * Method to convert twitter4j tweet status to application status
+     *
      * @param tweets
      * @return
      */
     private List<com.anibij.demoapp.model.Status> processStatus(List<twitter4j.Status> tweets) {
         List<com.anibij.demoapp.model.Status> statusList = new ArrayList<>();
 
-        for (twitter4j.Status status : tweets) {
+        for (int i = 0; i < tweets.size(); i++) {
+
+            if (maxId != Long.MAX_VALUE && i == 0) {
+                continue;
+            }
+
+            twitter4j.Status status = tweets.get(i);
             com.anibij.demoapp.model.Status newStatus = new com.anibij.demoapp.model.Status("default");
             newStatus.setId(new Long(status.getId()).toString());
-            newStatus.setUser(status.getUser().getName());
             newStatus.setCreatedAt(status.getCreatedAt().getTime());
+           // newStatus.setRetweetBy(status.getUser().getName());
 
-            boolean isRetweet =  status.isRetweet();
+            boolean isRetweet = status.isRetweet();
 
-            if(isRetweet){
-                status = status.getRetweetedStatus();
+            if (isRetweet) {
                 newStatus.setRetweetBy(status.getUser().getName());
+                status = status.getRetweetedStatus();
+
             }
-            newStatus.setMessage(status.getText());
             newStatus.setProfileImageUrl(status.getUser().getProfileImageURL());
+            newStatus.setUser(status.getUser().getName());
+            newStatus.setMessage(status.getText());
             newStatus.setRetweetCount(status.getRetweetCount());
             newStatus.setFavCount(status.getFavoriteCount());
             newStatus.setScreenName(status.getUser().getScreenName());
@@ -142,11 +158,11 @@ public class SearchUtility {
     }
 
 
-    public List<com.anibij.demoapp.model.User> fetchTwitterSearchUsers(int pageCount){
+    public List<com.anibij.demoapp.model.User> fetchTwitterSearchUsers(int pageCount) {
         List<com.anibij.demoapp.model.User> retUserList = new ArrayList<>();
         try {
-            Log.d(TAG,"Searching User "+prefSearchText);
-            ResponseList<User> users = mTwitter.searchUsers(prefSearchText,pageCount);
+            Log.d(TAG, "Searching User " + prefSearchText);
+            ResponseList<User> users = mTwitter.searchUsers(prefSearchText, pageCount);
             retUserList = processRetrievedUsers(users);
 
         } catch (TwitterException e) {
@@ -158,13 +174,14 @@ public class SearchUtility {
 
     private List<com.anibij.demoapp.model.User> processRetrievedUsers(ResponseList<User> users) {
         List<com.anibij.demoapp.model.User> retUserList = new ArrayList<>();
-        Log.d(TAG, "User Size : "+users.size());
+        Log.d(TAG, "User Size : " + users.size());
 
-        for(User user: users){
-            com.anibij.demoapp.model.User  myUser =  new com.anibij.demoapp.model.User();
+        for (User user : users) {
+            com.anibij.demoapp.model.User myUser = new com.anibij.demoapp.model.User();
+            myUser.setId(user.getId());
             myUser.setName(user.getName());
             myUser.setScreenName(user.getScreenName());
-            myUser.setLatestStatus(user.getStatus()!=null?user.getStatus().getText():"");
+            myUser.setLatestStatus(user.getStatus() != null ? user.getStatus().getText() : "");
             myUser.setProfileImageUrl(user.getProfileImageURL());
 
             retUserList.add(myUser);

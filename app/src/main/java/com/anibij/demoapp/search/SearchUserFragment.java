@@ -33,6 +33,10 @@ public class SearchUserFragment extends Fragment
         implements AbsListView.OnScrollListener {
 
     private static final String TAG = SearchUserFragment.class.getSimpleName() ;
+    private static final String PAGINATION_COUNT = "pagination_count" ;
+    private static final String USER_ITEM_LISTS = "user_lists" ;
+    private static final String TASK_RUNNING_STATUS = "task_running_status";
+    private static final String IS_MORE_ITEMS_AVAILABLE = "is_more_items_available";
 
     private SharedPreferences mSharedPreferences;
     // Declare Variables
@@ -41,15 +45,17 @@ public class SearchUserFragment extends Fragment
     private SearchUserAdapter mSearchUserAdapter;
     View progressBarView;
 
-    private List<User> userList;
+    private ArrayList<User> userList;
     ConnectionDetector cd;
     TextView mNoRecordView;
     AlertDialogManager alert = new AlertDialogManager();
-    private boolean loading = true;
+    private boolean loading = false;
     private int pageCount = 1;
     int previousTotal = 0;
-    private boolean isMoreItems = true;
+    private boolean initializeScroll = false;
+    private boolean noMoreItems =  false;
     private Context mContext;
+    private SearchUserTask mSearchUserTask;
 
     public SearchUserFragment() {
         // Required empty public constructor
@@ -65,7 +71,6 @@ public class SearchUserFragment extends Fragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        userList = new ArrayList<>();
         Log.d(TAG,"onCreate");
     }
 
@@ -74,7 +79,6 @@ public class SearchUserFragment extends Fragment
         Log.d(TAG,"onCreateView");
         View v = inflater.inflate(R.layout.search_user_list, container, false);
         mListView = (ListView) v.findViewById(R.id.search_user_listview);
-
         progressBarView = inflater.inflate(R.layout.search_progress_bar,null);
 
         return v;
@@ -83,7 +87,19 @@ public class SearchUserFragment extends Fragment
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.d(TAG,"onSavedInstanceState");
+        Log.d(TAG,"In onSavedInstanceState()");
+
+        //saving isMoreItems available
+        outState.putBoolean(IS_MORE_ITEMS_AVAILABLE,noMoreItems);
+        // save pagecount
+        outState.putInt(PAGINATION_COUNT,pageCount);
+        //save arraylist data
+        outState.putSerializable(USER_ITEM_LISTS,userList);
+        // save task running status
+        if(isTaskRunning()) {
+            outState.putBoolean(TASK_RUNNING_STATUS, true);
+        }
+
     }
 
     @Override
@@ -95,12 +111,46 @@ public class SearchUserFragment extends Fragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mSharedPreferences = getActivity().getSharedPreferences(AppPrefrences.PREF_NAME, 0);
-        Log.d(TAG,"onActivityCreated");
+        Log.d(TAG,"In onActivityCreated()");
+
+        userList = new ArrayList<>();
+        pageCount = 1;
+        initializeScroll = false;
+        noMoreItems = false;
 
         mSearchUserAdapter = new SearchUserAdapter(getActivity(),userList);
         mListView.setAdapter(mSearchUserAdapter);
         mListView.setOnScrollListener(this);
-        new SearchUserTask(1).execute();
+
+
+        if(savedInstanceState != null){
+            Log.d(TAG,"restoring saveInstance");
+
+            noMoreItems = savedInstanceState.getBoolean(IS_MORE_ITEMS_AVAILABLE,false);
+            pageCount =  savedInstanceState.getInt(PAGINATION_COUNT,1);
+            userList = (ArrayList<User>) savedInstanceState.getSerializable(USER_ITEM_LISTS);
+            Log.d(TAG,"In onActivityCreated() and savedInstance is NOT NULL, userList size : "+userList.size());
+
+            mSearchUserAdapter.setData(userList);
+            //mSearchUserAdapter.notifyDataSetChanged();
+
+            if(savedInstanceState.getBoolean(TASK_RUNNING_STATUS,false)){
+                loading = true;
+                mSearchUserTask = new SearchUserTask();
+                mSearchUserTask.setPageCount(pageCount);
+                mSearchUserTask.execute();
+            }else{
+                loading = false;
+            }
+
+        }else {
+
+            Log.d(TAG,"savedInstance is null");
+
+            mSearchUserTask = new SearchUserTask();
+            mSearchUserTask.setPageCount(pageCount);
+            mSearchUserTask.execute();
+        }
 
     }
 
@@ -114,6 +164,7 @@ public class SearchUserFragment extends Fragment
     public void onResume() {
         super.onResume();
         Log.d(TAG,"onResume");
+        initializeScroll = true;
     }
 
     @Override
@@ -145,12 +196,22 @@ public class SearchUserFragment extends Fragment
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG,"onDestroy");
+        if(isTaskRunning()) {
+            Log.d(TAG, "cancelling task");
+            mSearchUserTask.cancel(true);
+        }
+
     }
 
     @Override
     public void onStop() {
         super.onStop();
         Log.d(TAG,"onStop");
+    }
+
+    private boolean isTaskRunning(){
+        return (mSearchUserTask != null) &&
+                (mSearchUserTask.getStatus() == AsyncTask.Status.RUNNING);
     }
 
     @Override
@@ -162,18 +223,34 @@ public class SearchUserFragment extends Fragment
     public void onScroll(AbsListView view, int firstVisibleItem,
                          int visibleItemCount, int totalItemCount) {
 
+        // Log.d(TAG,"inside onScroll");
+
         //Log.d(TAG,"onscroll, totalItem, pageCount : "+totalItemCount + " : "+pageCount);
         // check if the List needs more data
-        if(isMoreItems && !loading && ((firstVisibleItem + visibleItemCount ) >= (totalItemCount))){
-            loading = true ;
-            loadMoreItems();
 
+        if (firstVisibleItem > 0) {
+
+            if (initializeScroll && !loading && ((firstVisibleItem + visibleItemCount) >= (totalItemCount))) {
+                Log.d(TAG, "In onScroll(): About to load data : firstvisible item : totalvisibleItem :"
+                        + firstVisibleItem + " : " + totalItemCount + " Loading Status : " + loading);
+
+                loading = true;
+                Log.d(TAG, "just before loading :" + loading);
+                if (!noMoreItems) {
+                    loadMoreItems();
+                }
+            }
         }
+
     }
 
 
     private void loadMoreItems(){
-        new SearchUserTask(pageCount).execute();
+        Log.d(TAG,"In loadMoreItems() :loading more users");
+            mSearchUserTask = new SearchUserTask();
+            mSearchUserTask.setPageCount(pageCount);
+            mSearchUserTask.execute();
+
     }
 
     private void incrementPageCount(){
@@ -182,37 +259,43 @@ public class SearchUserFragment extends Fragment
 
     private class SearchUserTask extends AsyncTask<Void,Void,List<User>>{
 
-        private int pageCount;
+        private int asyncTaskPageCount;
+
+        private void setPageCount(int count){
+            this.asyncTaskPageCount = count;
+        }
 
         @Override
         protected List<User> doInBackground(Void... params) {
-            Log.d(TAG,"fetching users");
+            Log.d(TAG,"doInBackground fetching users");
+
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            return new SearchUtility(getActivity()).fetchTwitterSearchUsers(pageCount);
+            return new SearchUtility(getActivity()).fetchTwitterSearchUsers(asyncTaskPageCount);
         }
 
-        public SearchUserTask(int pageCount) {
-            super();
-            this.pageCount = pageCount;
-        }
 
         @Override
         protected void onPostExecute(List<User> users) {
             super.onPostExecute(users);
-            Log.d(TAG,"received pcount and users  "+pageCount+ " : " +users.size());
-            if(users.size()== 0){
-                isMoreItems = false;
+            Log.d(TAG,"onPostExecute currentPageCount and user size  "+asyncTaskPageCount+ " : " +users.size());
+
+            if(users.size() < 20){
+                noMoreItems = true;
             }
-            if(users.size() > 0){
+            if(users.size() >= 20){
                 incrementPageCount();
             }
+
             mListView.removeFooterView(progressBarView);
-            mSearchUserAdapter.setData(users);
+            userList.addAll(users);
+            mSearchUserAdapter.notifyDataSetChanged();
+            //mSearchUserAdapter.setData(users);
             loading = false;
+
         }
 
         @Override

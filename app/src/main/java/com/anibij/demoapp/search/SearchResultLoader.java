@@ -6,6 +6,7 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
 import com.anibij.demoapp.Utils.AppPrefrences;
+import com.anibij.demoapp.model.Status;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,9 @@ public class SearchResultLoader extends AsyncTaskLoader<List<com.anibij.demoapp.
     private static final int MAX_SEARCH_RESULT = 50;
     private Context mContext;
     private String searchText;
-    private List<com.anibij.demoapp.model.Status> mStatues;
+    private List<com.anibij.demoapp.model.Status> mStatues = null;
+    private long maxId;
+    private boolean isRestartedLoad = false;
 
 
     private static SharedPreferences mSharedPreferences;
@@ -35,19 +38,45 @@ public class SearchResultLoader extends AsyncTaskLoader<List<com.anibij.demoapp.
     private static final String consumerKey = "o7kn8lHPoThttJhOejus6r1wJ";
     private static final String consumerSecret = "EfL1dRYw0xw6lWYogM4A7kuwCSwl2eeCINA746qTT28SSJsJnb";
 
-    public SearchResultLoader(Context context,String searchText) {
+    private SearchResultLoaderListener mSearchResultLoaderListener;
+
+    public interface SearchResultLoaderListener{
+        void onLoadStart();
+        void onLoadFinished();
+    }
+
+    public void setOnSearchResultLoaderListener(SearchResultLoaderListener listener){
+        this.mSearchResultLoaderListener =  listener;
+    }
+
+    public SearchResultLoader(Context context,String searchText,long maxId,List<Status> previousStatusList, boolean isRestartedLoad) {
         super(context);
         mStatues = new ArrayList<>();
+        this.isRestartedLoad = isRestartedLoad;
+
+        Log.d(TAG,"isRestarted? "+isRestartedLoad);
+
+        if(previousStatusList != null){
+            Log.d(TAG,"previousData exists");
+            mStatues.addAll(previousStatusList);
+        }else{
+            Log.d(TAG,"previousData DOESNOT exists");
+        }
+
         this.mContext =  context;
         this.searchText = searchText;
+        this.maxId = maxId;
          /* Initialize application preferences */
         mSharedPreferences = mContext.getSharedPreferences(AppPrefrences.PREF_NAME, 0);
     }
 
     @Override
     public List<com.anibij.demoapp.model.Status> loadInBackground() {
-
-        return new SearchUtility(mContext).fetchTwitterSearchTweets();
+        Log.d(TAG,"loadInBackground");
+        mSearchResultLoaderListener.onLoadStart();
+        List<Status> resultStatues = new SearchUtility(mContext).fetchTwitterSearchTweets(maxId);
+        mSearchResultLoaderListener.onLoadFinished();
+        return resultStatues;
     }
 
 
@@ -71,14 +100,13 @@ public class SearchResultLoader extends AsyncTaskLoader<List<com.anibij.demoapp.
 
         // Hold a reference to the old data so it doesn't get garbage collected.
         // We must protect it until the new data has been delivered.
-
         List<com.anibij.demoapp.model.Status> oldStatusList = mStatues;
-        mStatues = statuses;
+        mStatues.addAll(statuses);
 
 
         if (isStarted()) {
             Log.d(TAG,"Is Started...");
-            super.deliverResult(statuses);
+            super.deliverResult(mStatues);
         }
 
         if (oldStatusList != null && oldStatusList != statuses) {
@@ -95,11 +123,22 @@ public class SearchResultLoader extends AsyncTaskLoader<List<com.anibij.demoapp.
 
         Log.d(TAG,"onStartLoading");
 
-        if (mStatues != null) {
+        if (mStatues != null && mStatues.size() > 0) {
 
             // Deliver any previously loaded data immediately.
             Log.d(TAG,"calling deliverResult...");
-            deliverResult(mStatues);
+
+            if(!isRestartedLoad) {
+                Log.d(TAG,"delivering cached result");
+                deliverResult(mStatues);
+            }else {
+                Log.d(TAG,"calling forceLoad");
+                forceLoad();
+            }
+
+        }else{
+            Log.d(TAG,"first load");
+            forceLoad();
         }
 
         if (takeContentChanged() || mStatues == null) {

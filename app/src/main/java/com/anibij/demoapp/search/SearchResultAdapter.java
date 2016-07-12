@@ -21,7 +21,6 @@ import android.widget.Toast;
 import com.anibij.demoapp.DetailsActivity;
 import com.anibij.demoapp.R;
 import com.anibij.demoapp.StatusActivity;
-import com.anibij.demoapp.model.LoadMoreItemViewHolder;
 import com.anibij.demoapp.model.Status;
 import com.anibij.demoapp.model.StatusContract;
 import com.anibij.demoapp.model.StatusViewHolder;
@@ -61,7 +60,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter implements View.On
 
     @Override
     public int getItemViewType(int position) {
-        return VIEW_ITEM;
+        return mStatuses.get(position) == null ? VIEW_LOAD :VIEW_ITEM;
     }
 
     @Override
@@ -74,9 +73,9 @@ public class SearchResultAdapter extends RecyclerView.Adapter implements View.On
             Log.d(TAG,"Assigned StatusViewHolder");
 
         }else {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.load_more_items, parent, false);
-            vh = new LoadMoreItemViewHolder(view);
-            Log.d(TAG, "Assigned LoadMoreItemViewHolder");
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.search_progress_bar, parent, false);
+            vh = new LoadingViewHolder(view);
+            Log.d(TAG, "Assigned LoadingViewHolder");
         }
         return vh;
     }
@@ -259,10 +258,8 @@ public class SearchResultAdapter extends RecyclerView.Adapter implements View.On
             }
         }else{
 
-            Log.d(TAG,"Inside Load More Items");
-            Status status = mStatuses.get(position);
-            final String statusId = status.getId();
-            final int positionFinal = position;
+            Log.d(TAG,"Loading Progress bar");
+
 
         }
 
@@ -280,13 +277,14 @@ public class SearchResultAdapter extends RecyclerView.Adapter implements View.On
 
     public void setData(List<Status> statuses){
 
-        if(statuses != null){
+        if(statuses != null) {
+            Log.d(TAG,"data is not null");
             this.mStatuses = statuses;
-            //Toast.makeText(mContext, "Items Added", Toast.LENGTH_LONG).show();
 
         }else {
-           // Toast.makeText(mContext,"List is null",Toast.LENGTH_LONG).show();
+            Log.d(TAG,"data is null");
         }
+
         notifyDataSetChanged();
     }
 
@@ -297,4 +295,21 @@ public class SearchResultAdapter extends RecyclerView.Adapter implements View.On
         menu.add(0, v.getId(), 0, "SMS");
     }
 
+
+    public Status getItem(int lastItemPosition) {
+        if(mStatuses != null && mStatuses.size() != 0) {
+            return mStatuses.get(lastItemPosition - 1);
+        }
+        return null;
+    }
+
+
+    private class LoadingViewHolder extends RecyclerView.ViewHolder {
+        public FrameLayout mFrameLayout;
+
+        public LoadingViewHolder(View itemView) {
+            super(itemView);
+            mFrameLayout = (FrameLayout) itemView.findViewById(R.id.progressBarFrameLayout);
+        }
+    }
 }

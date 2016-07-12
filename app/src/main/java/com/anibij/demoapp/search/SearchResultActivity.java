@@ -14,6 +14,7 @@ import com.anibij.demoapp.view.SearchResultsActivity;
 public class SearchResultActivity extends AppCompatActivity {
 
     private static final String TAG = SearchResultsActivity.class.getSimpleName();
+    private static final String SEARCH_RESULT_TAB = "search_result_tab_fragment";
     FragmentManager mFragmentManager;
     FragmentTransaction mFragmentTransaction;
     Toolbar mToolbar;
@@ -33,11 +34,18 @@ public class SearchResultActivity extends AppCompatActivity {
         bundle.putString(SearchFragment.SEARCH_TEXT,searchText);
         Log.d(TAG,"Search text "+searchText);
 
-        SearchResultTabFragment fragment = new SearchResultTabFragment();
-        fragment.setArguments(bundle);
+        if(getSupportFragmentManager().findFragmentByTag(SEARCH_RESULT_TAB) == null){
+            Log.d(TAG,"SearchResultTabFragment " +
+                    "Does NOt Exists");
+            SearchResultTabFragment fragment = new SearchResultTabFragment();
+            fragment.setArguments(bundle);
+            getSupportFragmentManager().beginTransaction().replace(R.id.search_result_framelayout,fragment,SEARCH_RESULT_TAB).commit();
+        }else{
+            Log.d(TAG,"SearchResultTabFragment Exists");
+        }
 
-        mFragmentManager = getSupportFragmentManager();
-        mFragmentTransaction = mFragmentManager.beginTransaction();
-        mFragmentTransaction.replace(R.id.search_result_framelayout, fragment).commit();
+
+
+
     }
 }
