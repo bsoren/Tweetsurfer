@@ -94,7 +94,7 @@ public class StatusProvider extends ContentProvider {
 				values, SQLiteDatabase.CONFLICT_IGNORE); // 3
 
 		// Was insert successful?
-		if (rowId != -1) { // 4
+		if (rowId != -1) { // 4x`
 			long id = values.getAsLong(StatusContract.Column.ID);
 			ret = ContentUris.withAppendedId(uri, id); // 5
 			Log.d(TAG, "inserted uri: " + ret);

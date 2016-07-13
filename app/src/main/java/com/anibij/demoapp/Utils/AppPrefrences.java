@@ -17,7 +17,9 @@ public class AppPrefrences{
     public static final String PREF_USER_PROFILE_IMAGE_URL = "twitter_user_profile_image_url";
     public static final String PREF_LOAD_MORE_ITEM_LOCATIONS = "load_more_items";
 
-    public  static final String PREF_SINCE_ID = "since_id";
+    public  static final String PREF_SINCE_ID = "tweet_since_id";
+
+    public  static final String MENTION_PREF_SINCE_ID = "mention_since_id";
 
     private static SharedPreferences mSharedPreferences;
     private Context mContext;

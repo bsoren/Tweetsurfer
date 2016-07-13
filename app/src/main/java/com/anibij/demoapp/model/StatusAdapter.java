@@ -310,6 +310,7 @@ public class StatusAdapter extends RecyclerView.Adapter implements View.OnCreate
 
                     Intent refreshIntent = new Intent(mContext, RefreshService.class);
                     refreshIntent.putExtra("MAX_ID", statusId);
+                    refreshIntent.putExtra(StatusContract.TWEET_TYPE,StatusContract.TWEET);
                     mContext.startService(refreshIntent);
 
                     mStatuses.remove(positionFinal);

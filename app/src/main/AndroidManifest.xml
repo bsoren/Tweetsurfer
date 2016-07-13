@@ -54,7 +54,6 @@
         <receiver android:name=".service.StatusObserver">
             <intent-filter>
                 <action android:name="com.anibij.tweetsurferweetsurfer.NEW_STATUSES"/>
-
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </receiver>
@@ -64,6 +63,11 @@
         <provider
             android:name=".model.StatusProvider"
             android:authorities="com.anibij.demoapp"
+            android:exported="false"/>
+
+        <provider
+            android:name=".model.MentionTweetProvider"
+            android:authorities="com.anibij.demoapp.mentions"
             android:exported="false"/>
 
         <activity android:name=".search.SearchResultActivity" android:parentActivityName=".NewMainActivity">

@@ -36,5 +36,6 @@
 
     <string name="search_name">Search %1$s for</string>
     <string name="title_condensed">search condensed</string>
+    <string name="purgeMentions">purge mentions</string>
 
 </resources>

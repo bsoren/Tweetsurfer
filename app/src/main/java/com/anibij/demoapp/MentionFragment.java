@@ -30,6 +30,10 @@ import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
 import twitter4j.conf.ConfigurationBuilder;
 
+/**
+ * Obsolete use new MentionFragmentNew
+ */
+
 
 public class MentionFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match

@@ -30,6 +30,7 @@ public class StatusListLoader extends AsyncTaskLoader<List<Status>> {
     private ContentObserver mContentObserver;
     private Handler mHandler;
     private SharedPreferences mSharedPreferences,mSharedPreferences2;
+    private String contentProviderAuthority = "";
 
     List<Status> mStatues = new ArrayList<>();
 
@@ -41,6 +42,7 @@ public class StatusListLoader extends AsyncTaskLoader<List<Status>> {
         this.mHandler = handler;
         mSharedPreferences = new AppPrefrences(mContext).getInstance();
         mSharedPreferences2 = mContext.getSharedPreferences(AppPrefrences.PREF_NAME, 0);
+        contentProviderAuthority = mUri.getAuthority();
     }
 
     @Override
@@ -94,7 +96,10 @@ public class StatusListLoader extends AsyncTaskLoader<List<Status>> {
                     count++;
 
                     if(count == 1){
-                        mSharedPreferences2.edit().putLong(AppPrefrences.PREF_SINCE_ID,Long.valueOf(id)).commit();
+                        if(contentProviderAuthority.equals("com.anibij.demoapp"))
+                            mSharedPreferences2.edit().putLong(AppPrefrences.PREF_SINCE_ID,Long.valueOf(id)).commit();
+                        else
+                            mSharedPreferences2.edit().putLong(AppPrefrences.MENTION_PREF_SINCE_ID,Long.valueOf(id)).commit();
                         Log.d(TAG,"Since Id set to : "+id);
                     }
 
@@ -138,49 +143,6 @@ public class StatusListLoader extends AsyncTaskLoader<List<Status>> {
         return statusEntries;
     }
 
-
-    public String sortLocations(String locations){
-
-        String[] loc = locations.split(",");
-        int len = loc.length;
-        int[] locVal = new int[len];
-
-        for(int i=0;i<len;i++){
-            if(!loc[i].isEmpty()) {
-                locVal[i] = Integer.valueOf(loc[i]);
-            }
-        }
-
-        int len2 = locVal.length;
-
-        for(int j=0;j<len2;j++){
-            for(int k=j+1;k<len2;k++){
-                if(locVal[j]<= locVal[k]){
-
-                }else{
-                    int temp = locVal[k];
-                    locVal[k] = locVal[j];
-                    locVal[j] = temp;
-
-                }
-            }
-        }
-
-        StringBuilder ssb = new StringBuilder();
-
-        for(int ii=0;ii<len2;ii++){
-
-           ssb.append(locVal[ii]);
-
-            if(ii == len2-1)
-                ssb.append(",");
-
-        }
-
-        return ssb.toString();
-
-
-    }
 
 //    public StatusListLoader(Context context) {
 //        super(context);

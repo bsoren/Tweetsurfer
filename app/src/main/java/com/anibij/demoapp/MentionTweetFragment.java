@@ -17,6 +17,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -38,15 +41,15 @@ import java.util.List;
 /**
  * Created by bsoren on 29-Dec-15.
  */
-public class TweetFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Status>> {
+public class MentionTweetFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Status>> {
 
 
     // for broadcast receiver
     private TimelineReceiver mTimelineReceiver;
     private IntentFilter mIntentFilter;
 
-    private static final int LOADER_ID = 44;
-    private static final String TAG = TweetFragment.class.getSimpleName();
+    private static final int LOADER_ID = 55;
+    private static final String TAG = MentionTweetFragment.class.getSimpleName();
 
     private Toolbar toolbar;
 
@@ -77,7 +80,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mTimelineReceiver = new TimelineReceiver();
-        mIntentFilter = new IntentFilter(StatusContract.NEW_ITEMS);
+        mIntentFilter = new IntentFilter(StatusContract.MENTION_NEW_ITEMS);
         Log.d(TAG, "onActivityCreated method");
     }
 
@@ -121,10 +124,10 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
                 Toast.makeText(mContext, "Refreshing...", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(mContext, RefreshService.class);
 
-                long sinceIdLong = mSharedPreferences.getLong(AppPrefrences.PREF_SINCE_ID, 1000L);
+                long sinceIdLong = mSharedPreferences.getLong(AppPrefrences.MENTION_PREF_SINCE_ID, 1000L);
 
                 intent.putExtra("SINCE_ID", sinceIdLong);
-                intent.putExtra(StatusContract.TWEET_TYPE,StatusContract.TWEET);
+                intent.putExtra(StatusContract.TWEET_TYPE,StatusContract.MENTION_TWEET);
 
                 Log.d(TAG, "Sending since_id : " + sinceIdLong);
 
@@ -264,7 +267,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public android.support.v4.content.Loader<List<Status>> onCreateLoader(int id, Bundle args) {
         Log.d(TAG, "onCreateLoader");
-        mStatusListLoader = new StatusListLoader(mContext, StatusContract.CONTENT_URI, mContentResolver, new Handler());
+        mStatusListLoader = new StatusListLoader(mContext, StatusContract.MENTION_CONTENT_URI, mContentResolver, new Handler());
         return mStatusListLoader;
     }
 
@@ -321,6 +324,26 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
         Log.d(TAG, "onPause");
         super.onPause();
         getActivity().unregisterReceiver(mTimelineReceiver);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.mention_menu,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.purgeMentions:
+                int deleteRows = getContext().getContentResolver().delete(StatusContract.MENTION_CONTENT_URI, null, null);
+                Toast.makeText(getContext(), "Deleted Rows : " + deleteRows, Toast.LENGTH_SHORT).show();
+                mSharedPreferences.edit().putLong(AppPrefrences.MENTION_PREF_SINCE_ID,1000L).commit();
+                getActivity().sendBroadcast(new Intent(StatusContract.MENTION_NEW_ITEMS));
+                Log.d(TAG, "BroadCast sent from MentionTweetFragment");
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     // Broadcast Receiver

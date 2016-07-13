@@ -200,7 +200,7 @@ public class TabFragment extends Fragment {
                     return new TweetFragment();
                 case 1:
                     //((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Mentions");
-                    return new MentionFragment();
+                    return new MentionTweetFragment();
                 case 2:
                     //((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Messages");
                     return new DirectMessageFragment();

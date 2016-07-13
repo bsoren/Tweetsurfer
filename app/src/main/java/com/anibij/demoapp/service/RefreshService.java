@@ -39,6 +39,7 @@ public class RefreshService extends IntentService {
 
     String maxId;
     long sinceId;
+    int tweetType;
 
     private final static String TAG = "RefreshService";
     private static SharedPreferences mSharedPreferences;
@@ -65,6 +66,9 @@ public class RefreshService extends IntentService {
         return null;
     }
 
+
+    //public static final int TWEET = 1;
+    //public static final int MENTION_TWEET = 2;
     @Override
     public void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
@@ -73,6 +77,7 @@ public class RefreshService extends IntentService {
             if (intent.getExtras() != null) {
                 maxId = intent.getStringExtra("MAX_ID");
                 sinceId = intent.getLongExtra("SINCE_ID", 1000L);
+                tweetType = intent.getIntExtra(StatusContract.TWEET_TYPE,0);
 
             }
         }
@@ -144,7 +149,11 @@ public class RefreshService extends IntentService {
                 //page1.setPage(1);
                 page1.setCount(NO_OF_TWEETS);
                 page1.setMaxId(maxIdd);
-                statuses = twitter.getHomeTimeline(page1);
+
+                if(tweetType == 1)
+                    statuses = twitter.getHomeTimeline(page1);
+                else
+                    statuses = twitter.getMentionsTimeline(page1);
 
             } else {
 
@@ -153,7 +162,10 @@ public class RefreshService extends IntentService {
                 page2.setCount(NO_OF_TWEETS);
                 page2.setSinceId(sinceId);
                 Log.d(TAG, "MinId is null : and sinceId is " + sinceId);
-                statuses = twitter.getHomeTimeline(page2);
+                if(tweetType == 1)
+                    statuses = twitter.getHomeTimeline(page2);
+                else
+                    statuses = twitter.getMentionsTimeline(page2);
             }
 
             RateLimitStatus rateLimitStatus = statuses.getRateLimitStatus();
@@ -265,8 +277,10 @@ public class RefreshService extends IntentService {
                     values.put(StatusContract.Column.MEDIA_IMAGE, "NO_IMAGE");
                 }
 
-
-                uri = getContentResolver().insert(StatusContract.CONTENT_URI, values);
+                if(tweetType == 1)
+                    uri = getContentResolver().insert(StatusContract.CONTENT_URI, values);
+                else
+                    uri = getContentResolver().insert(StatusContract.MENTION_CONTENT_URI,values);
 
                 if (uri != null) {
 
@@ -321,15 +335,19 @@ public class RefreshService extends IntentService {
 //                }
 //            }
 
-            //if(count > 0){
-            Intent newIntent = new Intent(StatusContract.NEW_ITEMS);
-            newIntent.putExtra("count", count);
-            newIntent.putExtra("datasize", statuses.size());
-            sendBroadcast(newIntent);
-            Log.d(TAG, "BroadCast sent");
-
-
-            //}
+            if(tweetType == 1) {
+                Intent newIntent = new Intent(StatusContract.NEW_ITEMS);
+                newIntent.putExtra("count", count);
+                newIntent.putExtra("datasize", statuses.size());
+                sendBroadcast(newIntent);
+                Log.d(TAG, "BroadCast sent");
+            }else{
+                Intent newIntent = new Intent(StatusContract.MENTION_NEW_ITEMS);
+                newIntent.putExtra("count", count);
+                newIntent.putExtra("datasize", statuses.size());
+                sendBroadcast(newIntent);
+                Log.d(TAG, "BroadCast sent");
+            }
 
             Log.d(TAG, "Tweet Count :" + count);
             Log.d(TAG, "Retweets :" + retweetCount);
