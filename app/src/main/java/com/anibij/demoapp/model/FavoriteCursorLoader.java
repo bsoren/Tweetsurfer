@@ -36,6 +36,10 @@ public class FavoriteCursorLoader extends AsyncTaskLoader<Cursor> {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         Cursor c = db.rawQuery("select * from " + StatusContract.TABLE + " where " + StatusContract.Column.IS_FAVOURITE + "=1", null);
 
+        if(c.moveToFirst()){
+            Log.d(TAG, "Cursor Count : "+c.getCount());
+        }
+
         return c;
     }
 

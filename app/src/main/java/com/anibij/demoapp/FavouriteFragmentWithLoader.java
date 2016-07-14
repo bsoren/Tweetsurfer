@@ -5,10 +5,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.format.DateUtils;
@@ -30,20 +30,14 @@ import com.anibij.demoapp.model.StatusContract;
 import com.anibij.demoapp.view.AlertDialogManager;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import twitter4j.Twitter;
-import twitter4j.TwitterFactory;
-import twitter4j.auth.AccessToken;
-import twitter4j.conf.ConfigurationBuilder;
 
 
 public class FavouriteFragmentWithLoader extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String consumerKey = "o7kn8lHPoThttJhOejus6r1wJ";
     private static final String consumerSecret = "EfL1dRYw0xw6lWYogM4A7kuwCSwl2eeCINA746qTT28SSJsJnb";
-    private static final int LOADER_ID = 55;
+    private static final int LOADER_ID = 66;
     private static final String TAG = FavouriteFragmentWithLoader.class.getSimpleName() ;
 
     private static SharedPreferences mSharedPreferences;
@@ -73,9 +67,11 @@ public class FavouriteFragmentWithLoader extends Fragment implements LoaderManag
 
     SimpleCursorAdapter mSimpleCursorAdapter;
     FavoriteCursorLoader mFavoriteCursorLoader;
+    CursorLoader mCursorLoader;
     DbHelper dbHelper;
 
     String[] columns = {
+            StatusContract.Column.ID,
             StatusContract.Column.USER,
             StatusContract.Column.MESSAGE,
             StatusContract.Column.CREATED_AT,
@@ -85,6 +81,7 @@ public class FavouriteFragmentWithLoader extends Fragment implements LoaderManag
     };
 
     int[] to = {
+            R.id.statusId,
             R.id.userName,
             R.id.userLatestStatus,
             R.id.user_add_image,
@@ -101,6 +98,7 @@ public class FavouriteFragmentWithLoader extends Fragment implements LoaderManag
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG,"onCreate");
 
 
     }
@@ -108,6 +106,8 @@ public class FavouriteFragmentWithLoader extends Fragment implements LoaderManag
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        Log.d(TAG,"onCreateView - start");
 
         mSharedPreferences = getActivity().getSharedPreferences(PREF_NAME, 0);
         mContext = getActivity();
@@ -125,7 +125,7 @@ public class FavouriteFragmentWithLoader extends Fragment implements LoaderManag
 
         });
 
-        mSimpleCursorAdapter = new SimpleCursorAdapter(mContext, R.layout.list_row_mentions, null, columns, to);
+        mSimpleCursorAdapter = new SimpleCursorAdapter(mContext, R.layout.list_row_mentions, null, columns, to,0);
         mSimpleCursorAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
             @Override
             public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
@@ -167,6 +167,8 @@ public class FavouriteFragmentWithLoader extends Fragment implements LoaderManag
         //Initializing loader
         getLoaderManager().initLoader(LOADER_ID, null, this).forceLoad();
 
+        Log.d(TAG,"onCreateView - end");
+
         return view;
     }
 
@@ -200,8 +202,13 @@ public class FavouriteFragmentWithLoader extends Fragment implements LoaderManag
     public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         dbHelper = new DbHelper(mContext);
-        mFavoriteCursorLoader = new FavoriteCursorLoader(mContext, dbHelper);
-        return mFavoriteCursorLoader;
+        //mFavoriteCursorLoader = new FavoriteCursorLoader(mContext, dbHelper);
+        //return mFavoriteCursorLoader;
+        String selection = StatusContract.Column.IS_FAVOURITE + " = ? ";
+        String[] selectionArgs = new String[]{"1"};
+        mCursorLoader = new CursorLoader(mContext,StatusContract.CONTENT_URI,columns,selection,selectionArgs,null);
+
+        return mCursorLoader;
     }
 
     @Override
@@ -212,85 +219,5 @@ public class FavouriteFragmentWithLoader extends Fragment implements LoaderManag
     @Override
     public void onLoaderReset(android.support.v4.content.Loader<Cursor> loader) {
         mSimpleCursorAdapter.swapCursor(null);
-    }
-
-
-    private class RemoteDataTask extends AsyncTask<Void, Void, List<Status>> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            // Create a progressdialog
-            mProgressDialog = new ProgressDialog(getActivity());
-            // Set progressdialog title
-            mProgressDialog.setTitle("Retrieving Favorites...");
-            // Set progressdialog message
-            mProgressDialog.setMessage("Loading...");
-            mProgressDialog.setIndeterminate(false);
-            // Show progressdialog
-            mProgressDialog.show();
-        }
-
-        @Override
-        protected List<com.anibij.demoapp.model.Status> doInBackground(Void... params) {
-            // Create the array
-            statusList = new ArrayList<com.anibij.demoapp.model.Status>();
-            try {
-
-                ConfigurationBuilder builder = new ConfigurationBuilder();
-                builder.setOAuthConsumerKey(consumerKey);
-                builder.setOAuthConsumerSecret(consumerSecret);
-
-                // Access Token
-                String access_token = mSharedPreferences.getString(PREF_KEY_OAUTH_TOKEN, "");
-                // Access Token Secret
-                String access_token_secret = mSharedPreferences.getString(PREF_KEY_OAUTH_SECRET, "");
-
-                AccessToken accessToken = new AccessToken(access_token, access_token_secret);
-                Twitter twitter = new TwitterFactory(builder.build()).getInstance(accessToken);
-
-                List<twitter4j.Status> statuses = twitter.getFavorites();
-
-                for (twitter4j.Status returnStatus : statuses) {
-
-                    String id = String.valueOf(returnStatus.getId());
-                    String userName = returnStatus.getUser().getName();
-                    String screenName = returnStatus.getUser().getScreenName();
-                    String profileImage = returnStatus.getUser().getProfileImageURL();
-                    long createdAt = returnStatus.getCreatedAt().getTime();
-                    String textMessage = returnStatus.getText();
-                    int retweetCount = returnStatus.getRetweetCount();
-                    int favCount = returnStatus.getFavoriteCount();
-
-                    com.anibij.demoapp.model.Status newStatus =
-                            new com.anibij.demoapp.model.Status(id, userName, textMessage, createdAt, profileImage, null, null, retweetCount, favCount, screenName);
-
-                    statusList.add(newStatus);
-                }
-                return statusList;
-
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(List<com.anibij.demoapp.model.Status> result) {
-
-            if (result == null || result.size() <= 0) {
-
-                return;
-            }
-            // Locate the listview in listview_main.xml
-            listview = (ListView) view.findViewById(R.id.mentionListView);
-            mNoRecordView.setVisibility(View.GONE);
-            // Pass the results into ListViewAdapter.java
-            adapter = new MentionListViewAdapter(getActivity(), result);
-            // Binds the Adapter to the ListView
-            listview.setAdapter(adapter);
-            // Close the progressdialog
-            mProgressDialog.dismiss();
-        }
     }
 }
