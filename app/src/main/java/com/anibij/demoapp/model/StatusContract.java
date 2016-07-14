@@ -94,4 +94,32 @@ public class StatusContract {
 
 	}
 
+	public class DirectMessage{
+		public static final String TABLE_NAME = "direct_messages";
+
+		long createdAt;
+		long id;
+		String receipientName;
+		long recipientId;
+		String receipientScreenName;
+		String senderName;
+		long senderId;
+		String senderScreenName;
+		String textMessage;
+		String recipientImageUrl;
+
+		public class Column{
+			public static final String ID = BaseColumns._ID;
+			public static final String CREATED_AT = "created_at";
+			public static final String RECEPIENT_NAME = "receipient_name";
+			public static final String RECEPIENT_ID = "receipient_id";
+			public static final String RECEPIENT_SCREEN_NAME = "receipient_screen_name";
+			public static final String SENDER_NAME = "sender_name";
+			public static final String SENDER_ID = "sender_id";
+			public static final String SENDER_SCREEN_NAME = "sender_screen_name";
+			public static final String TEXT_MESSAGE =  "text_message";
+			public static final String RECEPIENT_IMAGE_URL = "receipient_image_url";
+		}
+	}
+
 }
