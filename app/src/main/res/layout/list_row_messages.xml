@@ -50,6 +50,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:textSize="10sp"
+                android:visibility="gone"
                 android:text="India Today Retweeted"
                 />
 
@@ -99,7 +100,7 @@
 
         <!-- 2 -->
         <TextView
-            android:id="@+id/user_add_image"
+            android:id="@+id/created_at"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@+id/userName"
@@ -114,7 +115,7 @@
             android:id="@+id/userLatestStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/user_add_image"
+            android:layout_below="@+id/created_at"
             android:layout_marginBottom="2dp"
             android:layout_toRightOf="@+id/user_profile_image"
             android:autoLink="web"

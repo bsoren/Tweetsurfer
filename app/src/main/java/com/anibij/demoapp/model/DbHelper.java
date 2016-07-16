@@ -46,21 +46,61 @@ public class DbHelper extends SQLiteOpenHelper {
 				StatusContract.MentionTweet.Column.SCREEN_NAME,
 				StatusContract.MentionTweet.Column.IS_FAVOURITE
 		);
+
+
+		/**
+		 *
+		 * public class Column{
+		 public static final String ID = BaseColumns._ID;
+		 public static final String CREATED_AT = "created_at";
+		 public static final String RECEPIENT_NAME = "receipient_name";
+		 public static final String RECEPIENT_ID = "receipient_id";
+		 public static final String RECEPIENT_SCREEN_NAME = "receipient_screen_name";
+		 public static final String SENDER_NAME = "sender_name";
+		 public static final String SENDER_ID = "sender_id";
+		 public static final String SENDER_SCREEN_NAME = "sender_screen_name";
+		 public static final String TEXT_MESSAGE =  "text_message";
+		 public static final String RECEPIENT_IMAGE_URL = "receipient_image_url";
+		 }
+		 *
+		 */
+
+		String dmTable = "create table %s"
+				+ " (%s int primary key, %s long, %s text, %s long, %s text, "
+				+ "%s text, %s long, %s text, %s text, %s text,%s text"
+				+")";
+		String directMessageTable = String.format(dmTable,
+				        StatusContract.DirectMessage.TABLE_NAME,
+						StatusContract.DirectMessage.Column.ID,
+						StatusContract.DirectMessage.Column.CREATED_AT,
+						StatusContract.DirectMessage.Column.RECEPIENT_NAME,
+						StatusContract.DirectMessage.Column.RECEPIENT_ID,
+						StatusContract.DirectMessage.Column.RECEPIENT_SCREEN_NAME,
+						StatusContract.DirectMessage.Column.SENDER_NAME,
+						StatusContract.DirectMessage.Column.SENDER_ID,
+						StatusContract.DirectMessage.Column.SENDER_SCREEN_NAME,
+						StatusContract.DirectMessage.Column.TEXT_MESSAGE,
+						StatusContract.DirectMessage.Column.RECEPIENT_IMAGE_URL,
+				        StatusContract.DirectMessage.Column.SENDER_IMAGE_URL
+
+				);
                         // 3
                 Log.d(TAG, "onCreate with SQL: " + statusTable);
 				Log.d(TAG, "onCreate with SQL: " + mentionStatusTable);
+		        Log.d(TAG, "onCreate with SQL: " + directMessageTable);
                 db.execSQL(statusTable); // 4
 				db.execSQL(mentionStatusTable);
+				db.execSQL(directMessageTable);
         }
 
 	// Gets called whenever existing version != new version, i.e. schema changed
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// 5
 		// Typically you do ALTER TABLE ...
             Log.d(TAG,"****** Dropping Table ****** ");
             db.execSQL("drop table if exists " + StatusContract.TABLE);
 		    db.execSQL("drop table if exists " + StatusContract.MentionTweet.TABLE_NAME);
+		    db.execSQL("drop table if exists " + StatusContract.DirectMessage.TABLE_NAME);
             onCreate(db);
 //            String query = String.format("alter table %s add column %s", StatusContract.TABLE, StatusContract.Column.IS_FAVOURITE);
 //            db.execSQL(query);

@@ -28,8 +28,8 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:paddingTop="20dp"
-        android:textSize="30sp"
-        android:text="No Records"
+        android:textSize="16sp"
+        android:text="No Records.Swipe down to refresh."
         android:textStyle="italic"
         android:textColor="#630606"
         android:visibility="visible"
@@ -47,6 +47,3 @@
 
 
 </RelativeLayout>
-
-
-    <!--android:layout_below="@+id/toolbar"-->

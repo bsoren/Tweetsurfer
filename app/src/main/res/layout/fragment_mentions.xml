@@ -36,9 +36,9 @@
         android:layout_alignParentTop="true"
         android:gravity="center_horizontal"
         android:paddingTop="20dp"
-        android:text="No Records"
+        android:text="No Records.Swipe Down to Refresh"
         android:textColor="#630606"
-        android:textSize="30sp"
+        android:textSize="15sp"
         android:textStyle="italic"
         android:visibility="visible"
         />

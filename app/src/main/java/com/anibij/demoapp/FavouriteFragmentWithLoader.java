@@ -119,7 +119,7 @@ public class FavouriteFragmentWithLoader extends Fragment implements LoaderManag
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                //refreshLayout.setRefreshing(false);
+                refreshLayout.setRefreshing(false);
 
             }
 
@@ -162,6 +162,7 @@ public class FavouriteFragmentWithLoader extends Fragment implements LoaderManag
                 return false;
             }
         });
+
         listview.setAdapter(mSimpleCursorAdapter);
 
         //Initializing loader
@@ -213,6 +214,15 @@ public class FavouriteFragmentWithLoader extends Fragment implements LoaderManag
 
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor data) {
+
+        if(data.getCount() > 0){
+            mNoRecordView.setVisibility(View.GONE);
+            listview.setVisibility(View.VISIBLE);
+        }else{
+            mNoRecordView.setVisibility(View.VISIBLE);
+            listview.setVisibility(View.GONE);
+        }
+
         mSimpleCursorAdapter.swapCursor(data);
     }
 

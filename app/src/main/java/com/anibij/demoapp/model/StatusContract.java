@@ -8,7 +8,7 @@ public class StatusContract {
 	// DB specific constants
 	// DB specific constants
 	public static final String DB_NAME = "tweetsurfer_timeline.db"; // 1
-	public static final int DB_VERSION = 6; // old 5
+	public static final int DB_VERSION = 10; // old 9
 	public static final String TABLE = "status"; // 3
 
 	public static final String UPDATE_INTERVAL = "UPDATE_INTERVAL";
@@ -53,7 +53,21 @@ public class StatusContract {
 			"vnd.android.cursor.dir/vnd.com.anibij.demoapp.provider.mentions";
 
 
-	public class Column { // 5
+	// for direct messages
+	public static final String DIRECT_MESSAGE_AUTHORITY = "com.anibij.demoapp.directmessages";
+	public static final Uri DM_CONTENT_URI = Uri.parse("content://"+DIRECT_MESSAGE_AUTHORITY
+			+"/"+DirectMessage.TABLE_NAME);
+
+	public static final int DIRECT_MESSAGE_ITEM = 1;
+	public static final int DIRECT_MESSAGE_DIR = 2;
+	public static final int DIRECT_MESSAGE_GROUP_BY_SENDER = 3;
+
+	public static final String DIRECT_MESSAGE_TYPE_ITEM =
+			"vnd.android.cursor.item/vnd.com.anibij.demoapp.provider.directmessages";
+	public static final String DIRECT_MESSAGE_TYPE_DIR =
+			"vnd.android.cursor.dir/vnd.com.anibij.demoapp.provider.directmessages";
+
+	public class Column {
 		public static final String ID = BaseColumns._ID; // 6
 		public static final String USER = "user";
 		public static final String MESSAGE = "message";
@@ -119,6 +133,7 @@ public class StatusContract {
 			public static final String SENDER_SCREEN_NAME = "sender_screen_name";
 			public static final String TEXT_MESSAGE =  "text_message";
 			public static final String RECEPIENT_IMAGE_URL = "receipient_image_url";
+			public static final String SENDER_IMAGE_URL = "sender_image_url";
 		}
 	}
 

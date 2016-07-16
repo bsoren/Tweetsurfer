@@ -10,13 +10,17 @@ public class DirectMessage {
     String receipientName;
     long recipientId;
     String receipientScreenName;
+    String recipientImageUrl;
+
     String senderName;
     long senderId;
     String senderScreenName;
+    String senderImageUrl;
     String textMessage;
-    String recipientImageUrl;
 
-    public DirectMessage(long createdAt, long id, String receipientName, long recipientId, String receipientScreenName, String senderName, long senderId, String senderScreenName, String textMessage, String recipientImageUrl) {
+
+    public DirectMessage(long createdAt, long id, String receipientName, long recipientId, String receipientScreenName, String senderName, long senderId,
+                         String senderScreenName, String textMessage, String recipientImageUrl, String senderImageUrl) {
         this.createdAt = createdAt;
         this.id = id;
         this.receipientName = receipientName;
@@ -27,6 +31,7 @@ public class DirectMessage {
         this.senderScreenName = senderScreenName;
         this.textMessage = textMessage;
         this.recipientImageUrl = recipientImageUrl;
+        this.senderImageUrl = senderImageUrl;
     }
 
     public long getCreatedAt() {
@@ -109,13 +114,27 @@ public class DirectMessage {
         this.recipientImageUrl = recipientImageUrl;
     }
 
+    public String getSenderImageUrl() {
+        return senderImageUrl;
+    }
+
+    public void setSenderImageUrl(String senderImageUrl) {
+        this.senderImageUrl = senderImageUrl;
+    }
+
     @Override
     public String toString() {
         return "DirectMessage{" +
-                "id=" + id +
-                ", createdAt=" + createdAt +
-                ", senderScreenName='" + senderScreenName + '\'' +
+                "createdAt=" + createdAt +
+                ", id=" + id +
+                ", receipientName='" + receipientName + '\'' +
+                ", recipientId=" + recipientId +
                 ", receipientScreenName='" + receipientScreenName + '\'' +
+                ", recipientImageUrl='" + recipientImageUrl + '\'' +
+                ", senderName='" + senderName + '\'' +
+                ", senderId=" + senderId +
+                ", senderScreenName='" + senderScreenName + '\'' +
+                ", senderImageUrl='" + senderImageUrl + '\'' +
                 ", textMessage='" + textMessage + '\'' +
                 '}';
     }
